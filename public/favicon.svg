@@ -1,0 +1,11 @@
+<svg data-favicon="transparent" xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Tab favicon: the app icon WITHOUT its dark ground, like world-cup-viewer.
+       Home-screen PNGs keep the ground (see the family icon recipe); only the tab is bare. -->
+  <!-- Custom hoop+net mark; background flat per docs/ICONS.md -->
+  <!-- Composition spans y 164..372 (centre 268); recentre to 256 and scale
+       1.3 so the mark fills ~62% of the canvas, inside the maskable safe zone. -->
+  <g transform="translate(256,256) scale(1.3) translate(-256,-268)">
+    <path fill="#ff7a29" fill-rule="evenodd" d="M 134,198 a 122,34 0 1,0 244,0 a 122,34 0 1,0 -244,0 Z M 158,198 a 98,22 0 1,0 196,0 a 98,22 0 1,0 -196,0 Z"/>
+    <path fill="#ff7a29" d="M 157.0,207.1 L 218.5,373.1 L 224.5,370.9 L 163.0,204.9 Z M 180.8,206.5 L 206.8,372.5 L 213.2,371.5 L 187.2,205.5 Z M 180.9,206.9 L 229.9,372.9 L 236.1,371.1 L 187.1,205.1 Z M 204.8,206.3 L 218.3,372.3 L 224.7,371.7 L 211.2,205.7 Z M 204.8,206.7 L 241.3,372.7 L 247.7,371.3 L 211.2,205.3 Z M 228.8,206.0 L 229.8,372.0 L 236.2,372.0 L 235.2,206.0 Z M 228.8,206.5 L 252.8,372.5 L 259.2,371.5 L 235.2,205.5 Z M 252.8,205.8 L 241.3,371.8 L 247.7,372.2 L 259.2,206.2 Z M 252.8,206.2 L 264.3,372.2 L 270.7,371.8 L 259.2,205.8 Z M 276.8,205.5 L 252.8,371.5 L 259.2,372.5 L 283.2,206.5 Z M 276.8,206.0 L 275.8,372.0 L 282.2,372.0 L 283.2,206.0 Z M 300.8,205.3 L 264.3,371.3 L 270.7,372.7 L 307.2,206.7 Z M 300.8,205.7 L 287.3,371.7 L 293.7,372.3 L 307.2,206.3 Z M 324.9,205.1 L 275.9,371.1 L 282.1,372.9 L 331.1,206.9 Z M 324.8,205.5 L 298.8,371.5 L 305.2,372.5 L 331.2,206.5 Z M 349.0,204.9 L 287.5,370.9 L 293.5,373.1 L 355.0,207.1 Z M 177.0,265.2 L 335.0,265.2 L 335.0,259.7 L 177.0,259.7 Z M 192.0,314.7 L 320.0,314.7 L 320.0,309.7 L 192.0,309.7 Z"/>
+  </g>
+</svg>
