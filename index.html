@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Women's March Madness — the NCAA tournament bracket in your timezone</title>
+    <meta
+      name="description"
+      content="An unofficial viewer for the NCAA Division I Women's Basketball Tournament: the full 68-team bracket, every game in your timezone, live scores, and the road to the Final Four."
+    />
+    <meta name="theme-color" content="#3a0d12" />
+    <link rel="canonical" href="https://ismayc.github.io/womens-march-madness/" />
+
+    <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="MM Women's" />
+
+    <!-- Open Graph (link previews in Slack/Discord/iMessage/Facebook) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Women's March Madness" />
+    <meta property="og:title" content="Women's March Madness — the NCAA tournament bracket in your timezone" />
+    <meta
+      property="og:description"
+      content="The full 68-team NCAA women's bracket — every game in your timezone, live scores, and the road to the Final Four."
+    />
+    <meta property="og:url" content="https://ismayc.github.io/womens-march-madness/" />
+    <meta property="og:image" content="https://ismayc.github.io/womens-march-madness/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Women's March Madness" />
+
+    <!-- Twitter card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Women's March Madness — the NCAA tournament bracket in your timezone" />
+    <meta
+      name="twitter:description"
+      content="The full 68-team NCAA women's bracket — every game in your timezone, live scores, and the road to the Final Four."
+    />
+    <meta name="twitter:image" content="https://ismayc.github.io/womens-march-madness/og-image.png" />
+
+    <script>
+      // Resolve the theme before first paint so there is no flash of the wrong one.
+      // System preference by default; an explicit choice wins and persists.
+      ;(function () {
+        try {
+          var t = localStorage.getItem('mmw:theme')
+          if (!t)
+            t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
+          document.documentElement.dataset.theme = t
+        } catch (e) {
+          document.documentElement.dataset.theme = 'dark'
+        }
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

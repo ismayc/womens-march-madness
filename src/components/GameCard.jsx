@@ -1,0 +1,129 @@
+import { TEAM_BY_ABBR } from '../data/teams.js'
+import { formatTime, formatZoneAbbr, liveState, countdown } from '../utils/time.js'
+import { watchableServices, broadcastNotBadged } from '../utils/watch.js'
+import { useFollow } from '../context/follow.jsx'
+import { useServices } from '../context/services.jsx'
+import TeamLogo from './TeamLogo.jsx'
+
+// Halftime and end-of-quarter are stable states; a running clock is not. Falls back
+// to ESPN's own label when the period is unknown.
+export function livePeriod(game) {
+  const label = game.statusLabel || ''
+  if (/half/i.test(label)) return 'HALF'
+  if (/end/i.test(label)) return label.toUpperCase()
+  const p = game.period
+  if (!p) return label.toUpperCase() || 'LIVE'
+  // Women's college basketball: four quarters, then overtime.
+  if (p > 4) return p - 4 > 1 ? `OT${p - 4}` : 'OT'
+  return ['1ST', '2ND', '3RD', '4TH'][p - 1] || 'LIVE'
+}
+
+function Side({ abbr, score, winner, hideScores }) {
+  const team = TEAM_BY_ABBR[abbr]
+  const { isFollowed, toggle } = useFollow()
+  const on = isFollowed(abbr)
+
+  return (
+    <div className={`side ${winner ? 'winner' : ''} ${on ? 'followed' : ''}`}>
+      <button
+        className={`star ${on ? 'on' : ''}`}
+        // The whole card is a button that opens the game detail, so the star has to
+        // stop the click from reaching it — otherwise following also opens a modal.
+        onClick={(e) => {
+          e.stopPropagation()
+          toggle(abbr)
+        }}
+        onKeyDown={(e) => e.stopPropagation()}
+        aria-pressed={on}
+        aria-label={`${on ? 'Unfollow' : 'Follow'} ${team?.displayName || abbr}`}
+        title={`${on ? 'Unfollow' : 'Follow'} ${team?.displayName || abbr}`}
+      >
+        {on ? '★' : '☆'}
+      </button>
+      <TeamLogo abbr={abbr} size={32} />
+      <span className="side-name">
+        <span className="side-loc">{team?.location}</span>
+        <span className="side-nick">{team?.name}</span>
+      </span>
+      {score != null && !hideScores && <span className="side-score">{score}</span>}
+    </div>
+  )
+}
+
+export default function GameCard({ game, tz, hideScores, onOpen }) {
+  const { services } = useServices()
+  const state = liveState(game)
+  const scored = game.score && !hideScores
+  const [hs, as] = game.score || []
+  const homeWon = scored && hs > as
+  const awayWon = scored && as > hs
+
+  // Which of the viewer's chosen services carry this game — a 📺 icon plus a label
+  // per service. Empty (no badge) until the viewer picks services.
+  const watch = watchableServices(game.broadcast, services)
+
+  const meta = []
+  if (game.venue) meta.push(game.city ? `${game.venue}, ${game.city}` : game.venue)
+  // Drop any network already shown as a 📺 badge (e.g. "Peacock") so it isn't repeated;
+  // the underlying networks of a bundle badge (ESPN for YouTube TV) still show.
+  const networks = broadcastNotBadged(game.broadcast, watch)
+  if (networks.length) meta.push(networks.slice(0, 3).join(' · '))
+
+  return (
+    <article
+      className={`game state-${state}`}
+      role="button"
+      tabIndex={0}
+      onClick={() => onOpen?.(game)}
+      onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), onOpen?.(game))}
+    >
+      <div className="game-when">
+        {state === 'live' ? (
+          // A basketball score changes every ~35 seconds, so anything shown here is
+          // stale by up to one refresh. The period is durable enough to display;
+          // the exact game clock is not, so it stays in the tooltip.
+          <span className="live-badge" title={`${game.statusLabel || 'Live'} — as of the last refresh`}>
+            ● {livePeriod(game)}
+          </span>
+        ) : state === 'void' ? (
+          <span className="void-badge">{game.canceled ? 'Canceled' : 'Postponed'}</span>
+        ) : game.score ? (
+          <span className="final-badge">Final{game.ot ? (game.ot > 1 ? `/${game.ot}OT` : '/OT') : ''}</span>
+        ) : (
+          <>
+            <span className="time">{formatTime(game.tip, tz)}</span>
+            <span className="zone">{formatZoneAbbr(game.tip, tz)}</span>
+          </>
+        )}
+      </div>
+
+      <div className="game-teams">
+        <Side abbr={game.away} score={as} winner={awayWon} hideScores={hideScores} />
+        <span className="at">@</span>
+        <Side abbr={game.home} score={hs} winner={homeWon} hideScores={hideScores} />
+      </div>
+
+      <div className="game-meta">
+        {game.note && <span className="note">{game.note}</span>}
+        {meta.map((m) => (
+          <span key={m}>{m}</span>
+        ))}
+        {watch.length > 0 && (
+          <span className="watch" aria-label={`Watch on ${watch.map((s) => s.label).join(', ')}`}>
+            <span className="watch-tv" aria-hidden="true">
+              📺
+            </span>
+            {watch.map((s) => (
+              <span key={s.key} className="watch-chip">
+                {s.label}
+              </span>
+            ))}
+          </span>
+        )}
+        {state === 'upcoming' && countdown(game.tip) && (
+          <span className="countdown">in {countdown(game.tip)}</span>
+        )}
+      </div>
+    </article>
+  )
+}
