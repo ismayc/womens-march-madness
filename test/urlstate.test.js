@@ -7,6 +7,7 @@ describe('readState', () => {
       view: 'bracket',
       tz: null,
       team: '',
+      game: '',
       hide: false,
       hideExplicit: false,
       mine: false,
@@ -16,10 +17,11 @@ describe('readState', () => {
   })
 
   it('reads every supported key', () => {
-    expect(readState('?view=schedule&tz=America/Chicago&team=MICH&hide=1&mine=1&past=1')).toEqual({
+    expect(readState('?view=schedule&tz=America/Chicago&team=MICH&game=401857072&hide=1&mine=1&past=1')).toEqual({
       view: 'schedule',
       tz: 'America/Chicago',
       team: 'MICH',
+      game: '401857072',
       hide: true,
       hideExplicit: true,
       mine: true,
@@ -83,6 +85,7 @@ describe('toSearch', () => {
     // readState also reports whether hide/past were explicit; toSearch wrote them, so both are.
     expect(readState(toSearch(state, detected))).toEqual({
       ...state,
+      game: '',
       hideExplicit: true,
       pastExplicit: true,
     })
