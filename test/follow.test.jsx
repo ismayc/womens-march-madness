@@ -122,7 +122,7 @@ describe('the follow store', () => {
   })
 
   it('survives corrupt localStorage rather than crashing', () => {
-    localStorage.setItem('nba:followed', 'not json')
+    localStorage.setItem('mmw:followed', 'not json')
     wrap(<Probe />)
     expect(screen.getByTestId('count').textContent).toBe('0')
   })

@@ -43,6 +43,7 @@ function slotFromGame(g, feeders) {
     ot: g.ot,
     tip: g.tip,
     winner,
+    /* v8 ignore next -- `?? null` is unreachable: a resolved game always has a distinct non-winner team, so find() never returns undefined */
     loser: winner ? teams.find((t) => t.abbr !== winner)?.abbr ?? null : null,
     live: !!g.live,
     complete: !!g.score,
@@ -68,6 +69,7 @@ const projectedSlot = (round, region, seeds, feeders) => ({
 })
 
 const slotLabel = (slot) => {
+  /* v8 ignore next -- defensive: linkRound always passes real prev slots (arrays are pre-filled), so slotLabel is never called with a nullish slot */
   if (!slot) return 'TBD'
   if (slot.winner) return slot.winner
   const seeds = slot.teams.map((t) => t.seed).filter(Boolean)

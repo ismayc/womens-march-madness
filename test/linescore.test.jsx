@@ -135,4 +135,10 @@ describe('livePeriod', () => {
     expect(livePeriod({ statusLabel: 'Delayed' })).toBe('DELAYED')
     expect(livePeriod({})).toBe('LIVE')
   })
+
+  it('shows a generic live label for a period outside the modeled quarters', () => {
+    // A truthy period the feed shouldn't emit (not a 1–4 quarter, not a 5+ overtime)
+    // misses the quarter-label array and hits the defensive `|| 'LIVE'` guard.
+    expect(livePeriod({ period: -1, statusLabel: '' })).toBe('LIVE')
+  })
 })

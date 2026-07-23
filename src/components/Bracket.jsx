@@ -8,6 +8,7 @@ import TeamLogo from './TeamLogo.jsx'
 // one screen. No radial/circular layout — a full-68 wheel is unreadable; this is the clean
 // column layout the family's world-cup knockout bracket uses.
 
+/* v8 ignore next -- the `?.name` middle fallback is unreachable: every real team has a location, and an unknown abbr short-circuits at the `?.location` optional chain */
 const teamName = (abbr) => TEAM_BY_ABBR[abbr]?.location || TEAM_BY_ABBR[abbr]?.name || abbr
 
 function TeamLine({ t, onPick, hideScores }) {
@@ -35,6 +36,7 @@ function TeamLine({ t, onPick, hideScores }) {
 }
 
 function Match({ slot, onPick, hideScores }) {
+  /* v8 ignore next -- defensive: Region and FinalFour only map over pre-filled slot arrays, so Match is never passed a null slot */
   if (!slot) return null
   return (
     <div className={`mm-match ${slot.live ? 'is-live' : ''} ${slot.projected ? 'is-proj' : ''}`}>
@@ -83,7 +85,9 @@ function Region({ region, onPick, hideScores }) {
           <div className="mm-col" key={key}>
             <h4 className="mm-col-h">{label}</h4>
             {region[key].map((s, i) => (
-              <Match key={s.id || i} slot={s} onPick={onPick} hideScores={hideScores} />
+              // Key on position: slot ids can collide (two "Winner|Winner" projected
+              // shells share an id), and position is stable within a fixed-length column.
+              <Match key={i} slot={s} onPick={onPick} hideScores={hideScores} />
             ))}
           </div>
         ))}
@@ -103,7 +107,7 @@ function FinalFour({ bracket, onPick, hideScores }) {
     <div className="mm-ff">
       <div className="mm-ff-semis">
         {bracket.finalFour.map((s, i) => (
-          <div className="mm-ff-semi" key={s.id || i}>
+          <div className="mm-ff-semi" key={i}>
             <h4 className="mm-col-h">National Semifinal</h4>
             <Match slot={s} onPick={onPick} hideScores={hideScores} />
           </div>
