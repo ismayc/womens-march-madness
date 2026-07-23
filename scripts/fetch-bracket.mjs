@@ -219,25 +219,32 @@ async function mirrorLogos(teams) {
   await mkdir(join(ROOT, 'public/logos'), { recursive: true })
   let n = 0
   let bytes = 0
+  const grab = async (url) => {
+    if (!url) return null
+    try {
+      const res = await fetch(resized(url))
+      if (!res.ok) return null
+      return Buffer.from(await res.arrayBuffer())
+    } catch {
+      return null // skip a single bad logo rather than fail the whole build
+    }
+  }
+  const put = async (file, buf) => {
+    await writeFile(join(ROOT, 'public/logos', file), buf)
+    n++
+    bytes += buf.length
+  }
   await Promise.all(
-    teams.flatMap((t) =>
-      [
-        [t.logo, `${t.slug}.png`],
-        [t.logoDark, `${t.slug}-dark.png`],
-      ].map(async ([url, file]) => {
-        if (!url) return
-        try {
-          const res = await fetch(resized(url))
-          if (!res.ok) return // a missing college logo is not fatal
-          const buf = Buffer.from(await res.arrayBuffer())
-          await writeFile(join(ROOT, 'public/logos', file), buf)
-          n++
-          bytes += buf.length
-        } catch {
-          /* skip a single bad logo rather than fail the whole build */
-        }
-      })
-    )
+    teams.map(async (t) => {
+      const light = await grab(t.logo)
+      if (!light) return
+      await put(`${t.slug}.png`, light)
+      // NCAA teams have no ESPN "dark" logo variant, but the app's dark theme renders
+      // `${slug}-dark.png` — so fall back to the light logo (a full-colour college mark
+      // reads fine on the dark ground). Without this the logo is invisible in dark mode.
+      const dark = (await grab(t.logoDark)) ?? light
+      await put(`${t.slug}-dark.png`, dark)
+    })
   )
   return { n, kb: Math.round(bytes / 1024) }
 }
