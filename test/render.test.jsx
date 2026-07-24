@@ -172,5 +172,18 @@ describe('ScheduleView', () => {
       const { container } = render(<ScheduleView games={[]} tz={TZ} />)
       expect(container.querySelector('.empty')).toBeTruthy()
     })
+
+    it('falls back to the last week of games when the tournament is over', () => {
+      // The whole bracket is in the past (no recent, no upcoming) — show its most recent
+      // game-days instead of a blank default view.
+      const finished = [
+        g('p1', shift(today, -40), 'MICH', 'CONN', [80, 70]),
+        g('p2', shift(today, -35), 'DUKE', 'ALA', [88, 84]),
+        g('p3', shift(today, -30), 'IOWA', 'OSU', [70, 66]),
+      ]
+      const { container } = render(<ScheduleView games={finished} tz={TZ} />)
+      expect(container.querySelector('.empty')).toBeFalsy()
+      expect(container.querySelectorAll('.day')).toHaveLength(3)
+    })
   })
 })
