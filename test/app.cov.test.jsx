@@ -76,7 +76,7 @@ describe('localStorage unavailable (private mode)', () => {
     await userEvent.click(spoiler)
 
     // showPast write catch (both directions).
-    const past = screen.getByRole('button', { name: /past days/ })
+    const past = screen.getByRole('button', { name: /full season/i })
     await userEvent.click(past)
     await userEvent.click(past)
 

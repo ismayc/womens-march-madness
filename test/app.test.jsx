@@ -158,7 +158,7 @@ describe('App', () => {
       await mount()
       const before = document.querySelectorAll('.day').length
       expect(before).toBeGreaterThan(0)
-      const btn = screen.getByRole('button', { name: /past days/ })
+      const btn = screen.getByRole('button', { name: /full season/i })
       expect(btn).toHaveAttribute('aria-pressed', 'true')
 
       await userEvent.click(btn)
@@ -169,7 +169,7 @@ describe('App', () => {
     it('reports how many past days there are', async () => {
       scheduleAt()
       await mount()
-      const btn = screen.getByRole('button', { name: /past days/ })
+      const btn = screen.getByRole('button', { name: /full season/i })
       const count = Number(within(btn).getByText(/^\d+$/).textContent)
       expect(count).toBeGreaterThan(0)
     })
@@ -177,7 +177,7 @@ describe('App', () => {
     it('remembers the choice per-device in localStorage', async () => {
       scheduleAt()
       await mount()
-      await userEvent.click(screen.getByRole('button', { name: /past days/ }))
+      await userEvent.click(screen.getByRole('button', { name: /full season/i }))
       await waitFor(() => expect(localStorage.getItem('mmw:showPast')).toBe('0'))
     })
 
@@ -185,7 +185,7 @@ describe('App', () => {
       localStorage.setItem('mmw:showPast', '0')
       scheduleAt()
       await mount()
-      expect(screen.getByRole('button', { name: /past days/ })).toHaveAttribute(
+      expect(screen.getByRole('button', { name: /full season/i })).toHaveAttribute(
         'aria-pressed',
         'false'
       )
@@ -195,7 +195,7 @@ describe('App', () => {
       localStorage.setItem('mmw:showPast', '0')
       scheduleAt('&past=1')
       await mount()
-      expect(screen.getByRole('button', { name: /past days/ })).toHaveAttribute(
+      expect(screen.getByRole('button', { name: /full season/i })).toHaveAttribute(
         'aria-pressed',
         'true'
       )

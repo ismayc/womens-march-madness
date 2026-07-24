@@ -47,6 +47,31 @@ describe('GameDetail', () => {
     for (const el of scores) expect(el.textContent).toBe('—')
   })
 
+  it('reveals just this game’s score on demand in spoiler-free mode', async () => {
+    const { container } = open(played, { hideScores: true })
+    expect(container.querySelector('.md-score')).toBeNull()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Reveal score' }))
+    // The score now shows and the button flips to hide.
+    expect(container.querySelector('.md-score').textContent).toBe(
+      `${played.score[1]} – ${played.score[0]}`
+    )
+
+    // And it re-masks on demand.
+    await userEvent.click(screen.getByRole('button', { name: 'Hide score' }))
+    expect(container.querySelector('.md-score')).toBeNull()
+  })
+
+  it('offers no reveal when spoiler-free is off', () => {
+    open(played)
+    expect(screen.queryByRole('button', { name: /reveal score|hide score/i })).toBeNull()
+  })
+
+  it('offers no reveal for an upcoming game even in spoiler-free mode', () => {
+    open(upcoming, { hideScores: true })
+    expect(screen.queryByRole('button', { name: /reveal score|hide score/i })).toBeNull()
+  })
+
   it('shows the tale of the tape on the matchup tab', async () => {
     // The tournament snapshot carries no regular-season record, so both sides read 0–0
     // and no side is highlighted "better"; the matchup comparison itself still renders.
