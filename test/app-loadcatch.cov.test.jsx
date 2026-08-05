@@ -81,4 +81,24 @@ describe('a rejecting live feed', () => {
     expect(document.querySelectorAll('.game').length).toBeGreaterThan(0)
     expect(document.body.textContent).not.toMatch(/Updated/)
   })
+
+  it('drops a poll that answers after the effect was torn down', async () => {
+    // Hold the poll open, unmount (which aborts), then let it answer. The guard has
+    // to swallow the result rather than stamp state onto a tree that is gone.
+    let settle
+    fetchLive.mockReturnValue(new Promise((res) => { settle = () => res(new Map()) }))
+    const { unmount } = render(
+      <FollowProvider>
+        <ServicesProvider>
+          <App />
+        </ServicesProvider>
+      </FollowProvider>
+    )
+    await waitFor(() => expect(fetchLive).toHaveBeenCalled())
+    unmount()
+    await act(async () => {
+      settle()
+    })
+    expect(document.body.textContent).not.toMatch(/Updated/)
+  })
 })

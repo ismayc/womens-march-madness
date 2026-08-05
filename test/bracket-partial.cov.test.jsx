@@ -84,6 +84,52 @@ describe('buildBracket — a partial tournament', () => {
   })
 })
 
+describe('buildBracket — games that do not fit the lineage', () => {
+  // Midwest, kept separate from FIXTURE so it cannot disturb the assertions above.
+  // Two shapes the seed/lineage mapping has to survive: a Round-of-64 game whose seed
+  // pair is not one the bracket has a slot for, and a Round-of-32 game left over after
+  // the lineage pass has already filled the slot it would otherwise land in.
+  const ODD_SEEDS = game({
+    id: 'm64-odd', round: 'R64', region: 'Regional 3',
+    home: 'M5', away: 'M1', homeSeed: 5, awaySeed: 1, // 5 v 1 is not a Round-of-64 pairing
+    score: [70, 68], winner: 'home',
+  })
+  const CANON = game({
+    id: 'm64-0', round: 'R64', region: 'Regional 3',
+    home: 'M1', away: 'M16', homeSeed: 1, awaySeed: 16,
+    score: [90, 60], winner: 'home',
+  })
+  // Joins the 1-seed's win, so the lineage pass claims Round-of-32 slot 0.
+  const LINEAGE = game({
+    id: 'm32-0', round: 'R32', region: 'Regional 3',
+    home: 'M1', away: 'M8', homeSeed: 1, awaySeed: 8,
+    score: [77, 70], winner: 'home',
+  })
+  // Joins nothing, so it is still unused when the leftover fill runs.
+  const ORPHAN = game({
+    id: 'm32-x', round: 'R32', region: 'Regional 3',
+    home: 'M6', away: 'M3', homeSeed: 6, awaySeed: 3,
+    score: [65, 60], winner: 'home',
+  })
+
+  const mid = buildBracket([CANON, ODD_SEEDS, LINEAGE, ORPHAN]).regions.find(
+    (r) => r.name === 'Regional 3'
+  )
+
+  it('drops a Round-of-64 game whose seed pair has no slot', () => {
+    const ids = mid.r64.filter(Boolean).map((s) => s.id)
+    expect(ids).toContain('m64-0')
+    expect(ids).not.toContain('m64-odd')
+  })
+
+  it('steps over an already-filled slot when placing a leftover game', () => {
+    // Slot 0 was claimed by lineage, so the orphan must land further down rather
+    // than overwriting it.
+    expect(mid.r32[0].id).toBe('m32-0')
+    expect(mid.r32.filter(Boolean).map((s) => s.id)).toContain('m32-x')
+  })
+})
+
 describe('Bracket component — partial field render', () => {
   beforeEach(() => localStorage.clear())
   const view = (games = FIXTURE) =>

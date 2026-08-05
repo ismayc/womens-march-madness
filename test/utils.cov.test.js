@@ -4,6 +4,7 @@ import { detectEvents } from '../src/services/alerts.js'
 import { buildIcs } from '../src/utils/ics.js'
 import { writeState } from '../src/utils/urlState.js'
 import { broadcastNotBadged } from '../src/utils/watch.js'
+import { playersByTeam } from '../src/utils/stats.js'
 import { GAMES } from '../src/data/schedule.js'
 
 // ── espn.js remaining branches (lines 20-21, 62) ────────────────────────────
@@ -126,5 +127,28 @@ describe('broadcastNotBadged with no watched list', () => {
   it('treats an absent watched list as empty (line 48)', () => {
     expect(broadcastNotBadged(['CBS'], undefined)).toEqual(['CBS'])
     expect(broadcastNotBadged(['CBS', 'TBS'], null)).toEqual(['CBS', 'TBS'])
+  })
+})
+
+// ── stats.js: the roster lookup behind GameDetail's top-scorer line ─────────
+describe('playersByTeam', () => {
+  const roster = [
+    { short: 'B. Second', team: 'DUKE', avgPoints: 12.4 },
+    { short: 'A. Leader', team: 'DUKE', avgPoints: 19.1 },
+    // Two with no average recorded yet, so the `?? 0` fallback is exercised on
+    // both sides of the comparator rather than only whichever one V8 passes second.
+    { short: 'C. Bench', team: 'DUKE' },
+    { short: 'E. Walkon', team: 'DUKE' },
+    { short: 'D. Other', team: 'UNC', avgPoints: 22.0 },
+  ]
+
+  it('keeps one team and ranks it by scoring, with no average sorting last', () => {
+    const ranked = playersByTeam('DUKE', roster).map((p) => p.short)
+    expect(ranked.slice(0, 2)).toEqual(['A. Leader', 'B. Second'])
+    expect(ranked.slice(2).sort()).toEqual(['C. Bench', 'E. Walkon'])
+  })
+
+  it('returns nothing for a team with nobody on it', () => {
+    expect(playersByTeam('ZZZ', roster)).toEqual([])
   })
 })
