@@ -76,8 +76,9 @@ export function dayLabel(key, tz, now = new Date()) {
   }).format(d)
 }
 
-// A NBA game runs ~2h; treat that as the window in which a game with no live feed
-// should still be considered possibly in progress.
+// A college game runs ~2h (two 20-minute halves plus stoppages and TV); treat that as
+// the window in which a game with no live feed should still be considered possibly in
+// progress.
 const GAME_MS = 2.25 * 60 * 60 * 1000
 
 export function liveState(game, now = Date.now()) {
@@ -87,6 +88,17 @@ export function liveState(game, now = Date.now()) {
   const start = new Date(game.tip).getTime()
   if (now < start) return 'upcoming'
   return now < start + GAME_MS ? 'likely-live' : 'past'
+}
+
+// Which bucket the "When" quick-filter puts a game in. A game that has tipped but has
+// no feed yet still reads as live, since that's what the viewer sees on the card. 'void'
+// is its own bucket so a postponed game never masquerades as a finished one.
+export function whenBucket(game, now = Date.now()) {
+  const state = liveState(game, now)
+  if (state === 'live' || state === 'likely-live') return 'live'
+  if (state === 'upcoming') return 'upcoming'
+  if (state === 'void') return 'void'
+  return 'final'
 }
 
 export function countdown(iso, now = Date.now()) {

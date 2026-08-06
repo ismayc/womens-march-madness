@@ -1,4 +1,4 @@
-import { useMemo, useRef, useEffect } from 'react'
+import { useMemo, useRef, useEffect, useState } from 'react'
 import { dayKey, dayLabel, todayKey } from '../utils/time.js'
 import GameCard from './GameCard.jsx'
 
@@ -54,6 +54,25 @@ export default function ScheduleView({ games, tz, hideScores, showPast = false, 
     anchorRef.current?.scrollIntoView({ block: 'start' })
   }, [showPast, anchorKey])
 
+  // Per-day folding and per-day spoiler overrides. Deliberately component-local: a day
+  // you folded is a reading position, not a preference worth carrying in the URL — and a
+  // new readState key would break the deep-equal URL tests across every sibling fork.
+  const [foldedDays, setFoldedDays] = useState(() => new Set())
+  const [dayOverrides, setDayOverrides] = useState({})
+
+  const toggleDay = (key) =>
+    setFoldedDays((prev) => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
+  // An override is sticky per day and wins over the global spoiler toggle in BOTH
+  // directions, so you can reveal one regional final without giving up spoiler-free mode
+  // for the rest of the bracket — or re-hide a day you haven't caught up on.
+  const scoresHidden = (key) => (key in dayOverrides ? dayOverrides[key] : hideScores)
+  const toggleReveal = (key) => setDayOverrides((prev) => ({ ...prev, [key]: !scoresHidden(key) }))
+
   if (!days.length) {
     return (
       <section className="view">
@@ -64,23 +83,48 @@ export default function ScheduleView({ games, tz, hideScores, showPast = false, 
 
   return (
     <section className="view schedule">
-      {days.map(([key, dayGames]) => (
-        <div
-          className={`day ${key === today ? 'is-today' : ''}`}
-          key={key}
-          ref={key === anchorKey ? anchorRef : null}
-        >
-          <h3 className="day-head">
-            <span>{dayLabel(key, tz)}</span>
-            <span className="day-count">{dayGames.length} game{dayGames.length === 1 ? '' : 's'}</span>
-          </h3>
-          <div className="day-games">
-            {dayGames.map((g) => (
-              <GameCard key={g.id} game={g} tz={tz} hideScores={hideScores} onOpen={onOpen} />
-            ))}
+      {days.map(([key, dayGames]) => {
+        const folded = foldedDays.has(key)
+        const hidden = scoresHidden(key)
+        return (
+          <div
+            className={`day ${key === today ? 'is-today' : ''}`}
+            key={key}
+            id={`day-${key}`}
+            ref={key === anchorKey ? anchorRef : null}
+          >
+            <h3 className="day-head">
+              <button
+                className="day-fold"
+                onClick={() => toggleDay(key)}
+                aria-expanded={!folded}
+                aria-label={`${folded ? 'Show' : 'Hide'} games on ${dayLabel(key, tz)}`}
+              >
+                <span className="day-caret" aria-hidden="true">
+                  {folded ? '▸' : '▾'}
+                </span>
+                <span className="day-name">{dayLabel(key, tz)}</span>
+              </button>
+              <span className="day-count">{dayGames.length} game{dayGames.length === 1 ? '' : 's'}</span>
+              <button
+                className="day-eye"
+                onClick={() => toggleReveal(key)}
+                aria-pressed={hidden}
+                title={hidden ? 'Show scores for this day' : 'Hide scores for this day'}
+              >
+                {hidden ? '🙈' : '👁'}
+              </button>
+            </h3>
+            {!folded && (
+              <div className="day-games">
+                {dayGames.map((g) => (
+                  <GameCard key={g.id} game={g} tz={tz} hideScores={hidden} onOpen={onOpen} />
+                ))}
+              </div>
+            )}
           </div>
-        </div>
-      ))}
+        )
+      })}
     </section>
   )
 }

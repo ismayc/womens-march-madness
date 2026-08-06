@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { GAMES } from './data/schedule.js'
 import { SEASON, TEAMS } from './data/teams.js'
-import { detectTimezone, timezoneOptions, dayKey, todayKey } from './utils/time.js'
+import { detectTimezone, timezoneOptions, dayKey, todayKey, whenBucket } from './utils/time.js'
 import { readState, writeState } from './utils/urlState.js'
 import { applyLive, fetchLive, liveCount } from './services/espn.js'
 import { watchableServices } from './utils/watch.js'
 import { useFollow } from './context/follow.jsx'
 import { useServices } from './context/services.jsx'
 import ScheduleView from './components/ScheduleView.jsx'
+import NextGame from './components/NextGame.jsx'
 import Bracket from './components/Bracket.jsx'
 import GameDetail from './components/GameDetail.jsx'
 import CalendarModal from './components/CalendarModal.jsx'
@@ -24,6 +25,14 @@ const VIEWS = [
 const LIVE_REFRESH_MS = 30_000
 const IDLE_REFRESH_MS = 120_000
 const NS = 'mmw' // localStorage namespace — women's March Madness
+
+// The "When" quick filter. Exclusive — a game is in exactly one of these at a time —
+// so clicking the active chip clears it rather than stacking a second bucket.
+const WHEN_FILTERS = [
+  { id: 'live', label: '🔴 Live' },
+  { id: 'upcoming', label: '⏱ Upcoming' },
+  { id: 'final', label: '✓ Finished' },
+]
 
 export default function App() {
   // Read the shared link once, on mount.
@@ -43,6 +52,7 @@ export default function App() {
   })
   const [team, setTeam] = useState(initial.team)
   const [onlyFollowed, setOnlyFollowed] = useState(initial.mine)
+  const [when, setWhen] = useState('')
   // The committed snapshot is a completed 3-week tournament, so every game day is in the
   // past — default to showing them (unlike a months-long league season, there's nothing to
   // bury). A shared ?past= link still overrides.
@@ -179,9 +189,11 @@ export default function App() {
       if (onlyFollowed && followedCount && !followed.has(g.home) && !followed.has(g.away)) return false
       if (watchOnly && serviceCount && watchableServices(g.broadcast, services).length === 0)
         return false
+      // Empty = any time; otherwise live/upcoming/finished as the card reads right now.
+      if (when && whenBucket(g) !== when) return false
       return true
     })
-  }, [games, team, onlyFollowed, followed, followedCount, watchOnly, services, serviceCount])
+  }, [games, team, onlyFollowed, followed, followedCount, watchOnly, services, serviceCount, when])
 
   const pastDayCount = useMemo(() => {
     const today = todayKey(tz)
@@ -343,6 +355,18 @@ export default function App() {
               <span className="chip-count">{pastDayCount}</span>
             </button>
           )}
+          <span className="chip-group when-chips">
+            {WHEN_FILTERS.map((w) => (
+              <button
+                key={w.id}
+                className={`chip ${when === w.id ? 'on' : ''}`}
+                onClick={() => setWhen((cur) => (cur === w.id ? '' : w.id))}
+                aria-pressed={when === w.id}
+              >
+                {w.label}
+              </button>
+            ))}
+          </span>
           <button
             className="chip"
             onClick={() => setShowCalendar(true)}
@@ -364,6 +388,7 @@ export default function App() {
             hideScores={hideScores}
           />
         )}
+        {view === 'schedule' && <NextGame games={scheduleGames} tz={tz} />}
         {view === 'schedule' && (
           <ScheduleView
             games={scheduleGames}
