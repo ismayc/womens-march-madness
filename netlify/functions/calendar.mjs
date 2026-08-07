@@ -9,7 +9,7 @@
 // does not apply: it may import from src/. It reuses the exact same buildIcs/applyLive/
 // fetchLive the browser uses, so the subscription and the app can never drift apart.
 //
-// Netlify Functions v2 (ESM default export). Query: ?teams=MIN,NY filters to those teams.
+// Netlify Functions v2 (ESM default export). Query: ?teams=DUKE,SC filters to those teams.
 import { GAMES } from '../../src/data/schedule.js'
 import { SEASON } from '../../src/data/teams.js'
 import { buildIcs } from '../../src/utils/ics.js'

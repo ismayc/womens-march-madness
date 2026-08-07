@@ -3,7 +3,7 @@
 // There's no router — `view` is a useState string — so the URL is kept in sync by
 // hand. Only non-default values are written, which keeps a shared link readable:
 //
-//   ?view=stats&tz=America/Chicago&team=MIN&hide=1
+//   ?view=schedule&tz=America/Chicago&team=DUKE&hide=1
 //
 // Writes use history.replaceState so changing a filter doesn't stack up back-button
 // entries.
