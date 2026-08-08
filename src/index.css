@@ -24,6 +24,11 @@
   --radius: 14px;
   --shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
   --page-bg: radial-gradient(1100px 560px at 85% -12%, #2d0d4a 0%, var(--bg) 58%);
+
+  /* Condensed view strip: one fixed-height row (plus the notch inset on phones),
+     declared as a token so sticky headers can offset beneath it and
+     scroll-margins can clear it without any JS measuring. */
+  --view-strip-h: calc(44px + env(safe-area-inset-top, 0px));
 }
 
 :root[data-theme='light'] {
@@ -219,6 +224,68 @@ select:hover,
   border-color: var(--accent);
   color: var(--accent-ink);
   font-weight: 600;
+}
+
+/* ── Condensed view strip ───────────────────────────────────────────────
+   Appears (position: fixed, so nothing reflows mid-scroll) once the in-flow
+   .views nav leaves the viewport. Fixed height --view-strip-h; the expanded
+   tab set overlays as a dropdown so the strip itself never grows. While it's
+   up, .nav-away offsets the bracket's sticky column headers, and the .day
+   scroll-margin always reserves for it. */
+.view-strip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--view-strip-h);
+  padding-top: env(safe-area-inset-top, 0px);
+  z-index: 30;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.view-strip-inner {
+  position: relative;
+  max-width: 1080px;
+  height: 100%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  padding: 0 calc(18px + env(safe-area-inset-right, 0px)) 0
+    calc(18px + env(safe-area-inset-left, 0px));
+}
+
+.view-strip-toggle {
+  font: inherit;
+  font-weight: 600;
+  color: var(--text);
+  background: none;
+  border: none;
+  padding: 4px 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.view-strip-toggle:hover { color: var(--accent); }
+.view-strip-toggle .chev {
+  font-size: 0.7em;
+  color: var(--text-faint);
+}
+
+.view-strip-tabs {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px calc(18px + env(safe-area-inset-right, 0px)) 12px
+    calc(18px + env(safe-area-inset-left, 0px));
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow);
 }
 
 .filters {
@@ -606,7 +673,9 @@ select:hover,
 
 .day {
   margin-bottom: 22px;
-  scroll-margin-top: 12px;
+  /* Reserve for the condensed view strip: the landing scroll is exactly what
+     summons it a frame later. */
+  scroll-margin-top: calc(var(--view-strip-h) + 12px);
 }
 
 .day-head {
@@ -3181,6 +3250,10 @@ select:hover,
   text-align: center;
   position: sticky;
   top: 0;
+}
+/* Pin beneath the condensed view strip instead of behind it. */
+.nav-away .mm-col-h {
+  top: var(--view-strip-h);
 }
 .mm-match {
   position: relative;

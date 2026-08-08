@@ -88,6 +88,11 @@ export default function App() {
   const [toasts, setToasts] = useState([])
   const [showCalendar, setShowCalendar] = useState(false)
   const prevGames = useRef(null)
+  const viewsRef = useRef(null)
+  // The in-flow tab nav has scrolled out of view (see the IntersectionObserver below).
+  const [navAway, setNavAway] = useState(false)
+  // The condensed strip's expanded tab set. Component-local — never persisted.
+  const [stripOpen, setStripOpen] = useState(false)
 
   const { count: followedCount, followed } = useFollow()
   const { services, count: serviceCount } = useServices()
@@ -205,8 +210,27 @@ export default function App() {
     return keys.size
   }, [scheduleGames, tz])
 
+  // Condensed view strip: once the in-flow tab nav scrolls out of view, a slim fixed
+  // strip takes over so switching views never means scrolling back to the top. The
+  // strip collapses again (and its expanded tab set closes) when the nav returns.
+  useEffect(() => {
+    if (typeof IntersectionObserver !== 'function') return
+    const io = new IntersectionObserver(([entry]) => {
+      const away = !entry.isIntersecting
+      setNavAway(away)
+      if (!away) setStripOpen(false)
+    })
+    io.observe(viewsRef.current)
+    return () => io.disconnect()
+  }, [])
+
+  const pickView = (id) => {
+    setView(id)
+    setStripOpen(false)
+  }
+
   return (
-    <div className="app">
+    <div className={`app${navAway ? ' nav-away' : ''}`}>
       <header className="top">
         <div className="brand">
           <h1>
@@ -264,18 +288,50 @@ export default function App() {
         </div>
       </header>
 
-      <nav className="views" aria-label="Views">
+      <nav className="views" aria-label="Views" ref={viewsRef}>
         {VIEWS.map((v) => (
           <button
             key={v.id}
             className={`view-btn ${view === v.id ? 'on' : ''}`}
-            onClick={() => setView(v.id)}
+            onClick={() => pickView(v.id)}
             aria-current={view === v.id ? 'page' : undefined}
           >
             {v.label}
           </button>
         ))}
       </nav>
+
+      {navAway && (
+        <div className="view-strip">
+          <div className="view-strip-inner">
+            <button
+              className="view-strip-toggle"
+              onClick={() => setStripOpen((o) => !o)}
+              aria-expanded={stripOpen}
+              aria-controls="view-strip-tabs"
+            >
+              {VIEWS.find((v) => v.id === view).label}
+              <span className="chev" aria-hidden="true">
+                {stripOpen ? '▲' : '▼'}
+              </span>
+            </button>
+            {stripOpen && (
+              <nav id="view-strip-tabs" className="view-strip-tabs" aria-label="Views quick switch">
+                {VIEWS.map((v) => (
+                  <button
+                    key={v.id}
+                    className={`view-btn ${view === v.id ? 'on' : ''}`}
+                    onClick={() => pickView(v.id)}
+                    aria-current={view === v.id ? 'page' : undefined}
+                  >
+                    {v.label}
+                  </button>
+                ))}
+              </nav>
+            )}
+          </div>
+        </div>
+      )}
 
       {view === 'schedule' && (
         <div className="filters">
