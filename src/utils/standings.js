@@ -8,10 +8,12 @@
 
 import { TEAMS, TEAM_BY_ABBR } from '../data/teams.js'
 
-// A game only counts toward a record if it is a completed regular-season game. Postponed
-// and canceled shells are excluded, which is what makes derived records match reality.
+// A game only counts toward a record once it is completed. Every committed game IS a
+// tournament game (the generator writes no seasonType — an old 'regular' gate here
+// matched nothing and zeroed every record), a live score is provisional until final,
+// and postponed/canceled shells are excluded.
 export const countsForStandings = (g) =>
-  g.seasonType === 'regular' && !!g.score && !g.postponed && !g.canceled
+  !!g.score && !g.live && !g.postponed && !g.canceled
 
 const blankRecord = (abbr) => ({
   abbr,

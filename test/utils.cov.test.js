@@ -65,7 +65,7 @@ describe('espn normalizer edge cases', () => {
 
 // ── alerts.js remaining branches (lines 19, 25, 28) ─────────────────────────
 describe('alerts detection edge cases', () => {
-  const g = (over = {}) => ({ id: 'g1', home: 'MICH', away: 'CONN', seasonType: 'regular', ...over })
+  const g = (over = {}) => ({ id: 'g1', home: 'MICH', away: 'CONN', ...over })
 
   it('handles a scoreless previous snapshot when a game turns into a nailbiter (lines 19, 25)', () => {
     // `was` is live and late but carries no score yet, so leaderOf/marginOf(was) return

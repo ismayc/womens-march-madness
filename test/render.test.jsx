@@ -117,7 +117,6 @@ describe('ScheduleView', () => {
     const g = (id, date, home, away, score) => ({
       id,
       tip: `${date}T16:00:00.000Z`, // noon ET — safely the same calendar day in TZ
-      seasonType: 'regular',
       home,
       away,
       ...(score ? { score } : {}),

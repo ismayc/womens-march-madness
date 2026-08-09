@@ -87,7 +87,6 @@ describe('GameDetail coverage', () => {
   it('renders a venue with a city but no state, omitting the trailing comma', () => {
     const game = {
       id: 'v1',
-      seasonType: 'regular',
       tip: '2026-03-05T00:00:00.000Z',
       home: 'DUKE',
       away: 'ALA',
@@ -109,7 +108,6 @@ describe('GameDetail coverage', () => {
   it('renders a venue with neither a city nor a state', () => {
     const game = {
       id: 'v2',
-      seasonType: 'regular',
       tip: '2026-03-05T00:00:00.000Z',
       home: 'DUKE',
       away: 'ALA',
@@ -127,7 +125,6 @@ describe('GameDetail coverage', () => {
   it('shows a live status label in the header, falling back to "Live"', () => {
     const live = {
       id: 'live1',
-      seasonType: 'regular',
       tip: '2026-03-06T00:00:00.000Z',
       home: 'DUKE',
       away: 'ALA',
@@ -145,38 +142,33 @@ describe('GameDetail coverage', () => {
     expect(document.querySelector('.md-state').textContent).toBe('Live')
   })
 
-  it('renders the season series and marks the better tale-of-the-tape side', async () => {
-    // Two prior regular-type meetings between DUKE and ALA, one each way, plus a lopsided
-    // record so a side is bolded. seasonType 'regular' is what makes them count.
+  it('marks the better tale-of-the-tape side, with no season-series section', async () => {
+    // Prior completed meetings between DUKE and ALA plus a lopsided record so a side is
+    // bolded. Even with meetings on file there is no "Season series" — every bracket
+    // matchup happens once, so the section was removed outright.
     const games = [
-      { id: 'a', seasonType: 'regular', tip: '2026-01-01T00:00:00.000Z', home: 'DUKE', away: 'ALA', score: [100, 90], line: { home: [], away: [] } },
-      { id: 'b', seasonType: 'regular', tip: '2026-02-01T00:00:00.000Z', home: 'ALA', away: 'DUKE', score: [70, 88], line: { home: [], away: [] } },
-      { id: 'c', seasonType: 'regular', tip: '2026-02-10T00:00:00.000Z', home: 'DUKE', away: 'ALA', score: [95, 60], line: { home: [], away: [] } },
+      { id: 'a', tip: '2026-01-01T00:00:00.000Z', home: 'DUKE', away: 'ALA', score: [100, 90], line: { home: [], away: [] } },
+      { id: 'b', tip: '2026-02-01T00:00:00.000Z', home: 'ALA', away: 'DUKE', score: [70, 88], line: { home: [], away: [] } },
+      { id: 'c', tip: '2026-02-10T00:00:00.000Z', home: 'DUKE', away: 'ALA', score: [95, 60], line: { home: [], away: [] } },
     ]
     const game = games[0]
     render(<GameDetail game={game} games={games} tz={TZ} onClose={() => {}} />)
     await userEvent.click(screen.getByRole('tab', { name: 'Matchup' }))
-    expect(screen.getByText(/Season series/)).toBeInTheDocument()
+    expect(screen.queryByText(/Season series/)).not.toBeInTheDocument()
     // The mocked roster lookup surfaces the "Leading scorer" TaleRow.
     expect(screen.getByText('Leading scorer')).toBeInTheDocument()
     // A lopsided record means at least one side is bolded.
     expect(document.querySelector('.tale-val.better')).toBeInTheDocument()
-
-    // Under spoiler-free mode the series scores are masked.
-    cleanup()
-    render(<GameDetail game={game} games={games} tz={TZ} hideScores onClose={() => {}} />)
-    await userEvent.click(screen.getByRole('tab', { name: 'Matchup' }))
-    expect(document.querySelector('.drill-score').textContent).toBe('—')
   })
 
   it('leaves the tale of the tape unmarked when the teams are dead even', async () => {
     // DUKE and ALA post identical records (each beats a third team the same way), so no
     // row is bolded on record / ppg / allowed.
     const games = [
-      { id: 'm1', seasonType: 'regular', tip: '2026-01-01T00:00:00.000Z', home: 'DUKE', away: 'FLA', score: [80, 70], line: { home: [], away: [] } },
-      { id: 'n1', seasonType: 'regular', tip: '2026-01-01T00:00:00.000Z', home: 'ALA', away: 'FUR', score: [80, 70], line: { home: [], away: [] } },
+      { id: 'm1', tip: '2026-01-01T00:00:00.000Z', home: 'DUKE', away: 'FLA', score: [80, 70], line: { home: [], away: [] } },
+      { id: 'n1', tip: '2026-01-01T00:00:00.000Z', home: 'ALA', away: 'FUR', score: [80, 70], line: { home: [], away: [] } },
     ]
-    const game = { id: 'even1', seasonType: 'regular', tip: '2027-01-01T00:00:00.000Z', home: 'ALA', away: 'DUKE' }
+    const game = { id: 'even1', tip: '2027-01-01T00:00:00.000Z', home: 'ALA', away: 'DUKE' }
     render(<GameDetail game={game} games={games} tz={TZ} onClose={() => {}} />)
     await userEvent.click(screen.getByRole('tab', { name: 'Matchup' }))
     expect(document.querySelectorAll('.tale-val.better').length).toBe(0)
@@ -192,7 +184,6 @@ describe('GameDetail coverage', () => {
     })
     const game = {
       id: 'inj1',
-      seasonType: 'regular',
       tip: '2026-03-08T00:00:00.000Z',
       home: 'DUKE',
       away: 'ALA',
@@ -208,7 +199,6 @@ describe('GameDetail coverage', () => {
   it('opens an upcoming game on the matchup tab with no scoring tab', async () => {
     const upcoming = {
       id: 'up1',
-      seasonType: 'regular',
       tip: '2027-03-01T00:00:00.000Z',
       home: 'DUKE',
       away: 'ALA',
@@ -228,7 +218,6 @@ describe('GameDetail coverage', () => {
   it('falls back to the first tab when the active one disappears', async () => {
     const upcoming = {
       id: 'up2',
-      seasonType: 'regular',
       tip: '2027-03-02T00:00:00.000Z',
       home: 'DUKE',
       away: 'ALA',
@@ -251,7 +240,6 @@ describe('GameDetail coverage', () => {
   it('labels multi-overtime periods (OT1/OT2) and suffixes the header /2OT', async () => {
     const twoOT = {
       id: 'ot2',
-      seasonType: 'regular',
       tip: '2026-03-09T00:00:00.000Z',
       home: 'DUKE',
       away: 'ALA',
@@ -274,7 +262,6 @@ describe('GameDetail coverage', () => {
   it('renders an en-dash for a missing period cell', async () => {
     const withGap = {
       id: 'gap1',
-      seasonType: 'regular',
       tip: '2026-03-09T00:00:00.000Z',
       home: 'DUKE',
       away: 'ALA',
@@ -290,7 +277,6 @@ describe('GameDetail coverage', () => {
   it('renders no line-score table when the periods are empty', async () => {
     const empty = {
       id: 'empty1',
-      seasonType: 'regular',
       tip: '2026-03-09T00:00:00.000Z',
       home: 'DUKE',
       away: 'ALA',
@@ -305,7 +291,6 @@ describe('GameDetail coverage', () => {
   it('hides game leaders with no stars or none on either roster', async () => {
     const base = {
       id: 'ns1',
-      seasonType: 'regular',
       tip: '2026-03-09T00:00:00.000Z',
       home: 'DUKE',
       away: 'ALA',
@@ -326,7 +311,6 @@ describe('GameDetail coverage', () => {
   it('shows game leaders with a known label and an uncategorised one verbatim', async () => {
     const game = {
       id: 'gl1',
-      seasonType: 'regular',
       tip: '2026-03-09T00:00:00.000Z',
       home: 'DUKE',
       away: 'ALA',
@@ -348,10 +332,10 @@ describe('GameDetail coverage', () => {
     // ALA (away) wins its game, DUKE (home) loses its game → away is "better" on record,
     // ppg, and allowed, lighting up the betterLeft === true arm of TaleRow.
     const games = [
-      { id: 't1', seasonType: 'regular', tip: '2026-01-01T00:00:00.000Z', home: 'ALA', away: 'FLA', score: [80, 70], line: { home: [], away: [] } },
-      { id: 't2', seasonType: 'regular', tip: '2026-01-01T00:00:00.000Z', home: 'FUR', away: 'DUKE', score: [80, 70], line: { home: [], away: [] } },
+      { id: 't1', tip: '2026-01-01T00:00:00.000Z', home: 'ALA', away: 'FLA', score: [80, 70], line: { home: [], away: [] } },
+      { id: 't2', tip: '2026-01-01T00:00:00.000Z', home: 'FUR', away: 'DUKE', score: [80, 70], line: { home: [], away: [] } },
     ]
-    const game = { id: 'tt1', seasonType: 'regular', tip: '2027-01-01T00:00:00.000Z', home: 'DUKE', away: 'ALA' }
+    const game = { id: 'tt1', tip: '2027-01-01T00:00:00.000Z', home: 'DUKE', away: 'ALA' }
     render(<GameDetail game={game} games={games} tz={TZ} onClose={() => {}} />)
     await userEvent.click(screen.getByRole('tab', { name: 'Matchup' }))
     // The away column carries the bolded value on the record row.

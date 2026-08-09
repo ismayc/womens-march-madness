@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { computeStandings, countsForStandings } from '../src/utils/standings.js'
+import { GAMES } from '../src/data/schedule.js'
 import { TEAMS } from '../src/data/teams.js'
 
 // Real abbreviations from the committed field, so the records land in the table.
@@ -7,7 +8,6 @@ const [A, B, C] = TEAMS.map((t) => t.abbr)
 
 const g = (id, home, away, hs, as, extra = {}) => ({
   id,
-  seasonType: 'regular',
   tip: `2026-03-${id}T23:00:00.000Z`,
   home,
   away,
@@ -16,15 +16,27 @@ const g = (id, home, away, hs, as, extra = {}) => ({
 })
 
 describe('countsForStandings', () => {
-  it('counts only completed regular-season games', () => {
+  it('counts only completed games', () => {
     expect(countsForStandings(g('01', A, B, 80, 70))).toBe(true)
-    // seasonType other than regular (a tournament game) does not count
-    expect(countsForStandings(g('02', A, B, 80, 70, { seasonType: 'postseason' }))).toBe(false)
     // no final score yet
     expect(countsForStandings({ ...g('03', A, B, 80, 70), score: null })).toBe(false)
+    // a live score is provisional, not a result
+    expect(countsForStandings(g('02', A, B, 80, 70, { live: true }))).toBe(false)
     // postponed / canceled shells
     expect(countsForStandings(g('04', A, B, 80, 70, { postponed: true }))).toBe(false)
     expect(countsForStandings(g('05', A, B, 80, 70, { canceled: true }))).toBe(false)
+  })
+
+  it('counts the COMMITTED games — the generator writes no seasonType to gate on', () => {
+    // The old `seasonType === 'regular'` gate matched nothing the generator emits,
+    // so every record and scoring average in GameDetail was silently 0-0 / 0.0.
+    // Only the test fixtures carried the phantom field, which kept this green.
+    const table = computeStandings(GAMES)
+    const played = Object.values(table).filter((r) => r.gp > 0)
+    expect(played.length).toBeGreaterThan(0)
+    // The champion's record recounts its committed tournament run.
+    const wins = Object.values(table).map((r) => r.w)
+    expect(Math.max(...wins)).toBeGreaterThanOrEqual(6) // six wins take the title
   })
 })
 

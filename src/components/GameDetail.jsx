@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { TEAM_BY_ABBR } from '../data/teams.js'
 import { formatDate, formatTime, formatZoneAbbr, liveState, countdown } from '../utils/time.js'
-import { computeStandings, countsForStandings } from '../utils/standings.js'
+import { computeStandings } from '../utils/standings.js'
 import { playersByTeam } from '../utils/stats.js'
 import { watchableServices, broadcastNotBadged } from '../utils/watch.js'
 import { fetchGameSummary } from '../services/summary.js'
@@ -12,21 +12,10 @@ import TeamLogo from './TeamLogo.jsx'
 
 const one = (n) => n.toFixed(1)
 
-// Season series between these two, so the detail answers "who's had the better of
-// this matchup" without a trip to the schedule.
-function useSeries(games, a, b) {
-  return useMemo(() => {
-    const met = games.filter(
-      (g) => countsForStandings(g) && [g.home, g.away].includes(a) && [g.home, g.away].includes(b)
-    )
-    const wins = { [a]: 0, [b]: 0 }
-    for (const g of met) {
-      const winner = g.score[0] > g.score[1] ? g.home : g.away
-      wins[winner]++
-    }
-    return { met, wins }
-  }, [games, a, b])
-}
+// There is deliberately NO season-series section here: every bracket matchup is played
+// exactly once, so two teams never have a prior meeting to list. (The scaffold's series
+// hook survived for a while behind a record gate that counted nothing; once records
+// worked it would have listed the viewed game as its own one-game "series".)
 
 // Basketball's answer to a goal timeline. Individual baskets are too numerous to
 // enumerate (~65 a game), but the quarter breakdown carries the shape of the game —
@@ -137,7 +126,6 @@ export default function GameDetail({ game, games, tz, hideScores, onClose, onPic
   const ref = useModalA11y(onClose, !!game)
   const { services } = useServices()
   const table = useMemo(() => computeStandings(games), [games])
-  const series = useSeries(games, game?.away, game?.home)
 
   // One ESPN summary request per game, fanned out into the box score, team stats,
   // injuries, attendance/officials, and win-probability sections below.
@@ -365,25 +353,6 @@ export default function GameDetail({ game, games, tz, hideScores, onClose, onPic
                 />
               )}
             </div>
-
-            {series.met.length > 0 && (
-              <>
-                <h4 className="md-sub">
-                  Season series — {series.wins[game.away]}–{series.wins[game.home]}
-                </h4>
-                <ul className="drill">
-                  {series.met.map((g) => (
-                    <li key={g.id}>
-                      <span className="drill-date">{formatDate(g.tip, tz)}</span>
-                      <span className="dim">{g.away} @ {g.home}</span>
-                      <span className="drill-score">
-                        {hide ? '—' : `${g.score[1]} – ${g.score[0]}`}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
 
             <InjuryReport summary={summary} game={game} />
           </div>

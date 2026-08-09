@@ -5,7 +5,6 @@ const g = (over = {}) => ({
   id: 'g1',
   home: 'MIN',
   away: 'SEA',
-  seasonType: 'regular',
   tip: '2026-07-20T23:00:00.000Z',
   ...over,
 })
