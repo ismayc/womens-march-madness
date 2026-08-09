@@ -45,12 +45,32 @@ describe('fetchLive', () => {
     expect(dates).toEqual(['20260719', '20260720', '20260721'])
   })
 
-  it('rolls over year boundaries correctly', async () => {
+  it('anchors the window on the US-Eastern day, rolling year boundaries', async () => {
     fetch.mockResolvedValue(scoreboard([]))
+    // Midnight UTC on Jan 1 is still New Year's Eve evening in New York — ESPN
+    // buckets dates= by the Eastern day, so the window is Dec 30–Jan 1, not
+    // Dec 31–Jan 2 (the old UTC anchor slid the window a day forward every US
+    // evening and dropped yesterday's finals).
     await fetchLive({ now: new Date('2026-01-01T00:00:00Z') })
 
     const dates = fetch.mock.calls.map((c) => new URL(c[0]).searchParams.get('dates'))
-    expect(dates).toEqual(['20251231', '20260101', '20260102'])
+    expect(dates).toEqual(['20251230', '20251231', '20260101'])
+  })
+
+  it('derives a winner for a final — and never for a live lead', async () => {
+    // The bracket advances on `winner`; a game finishing between data refreshes
+    // must carry one, and a live lead must not.
+    fetch.mockResolvedValue(
+      scoreboard([
+        event({ id: 'fin', state: 'post', completed: true, home: 71, away: 65 }),
+        event({ id: 'upset', state: 'post', completed: true, home: 60, away: 62 }),
+        event({ id: 'lead', state: 'in', completed: false, home: 40, away: 30 }),
+      ])
+    )
+    const live = await fetchLive({ now: NOW })
+    expect(live.get('fin').winner).toBe('home')
+    expect(live.get('upset').winner).toBe('away')
+    expect(live.get('lead').winner).toBeUndefined()
   })
 
   it('returns games keyed by id', async () => {
