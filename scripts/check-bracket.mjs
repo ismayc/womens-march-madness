@@ -12,6 +12,7 @@
 import { readFile } from 'node:fs/promises'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { getJson } from './lib/fetch.mjs'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const SITE = 'https://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball'
@@ -26,37 +27,6 @@ const SEASON = Number(argVal('--season')) || 2026
 const START = argVal('--start') || `${SEASON}0315`
 const END = argVal('--end') || `${SEASON}0408`
 
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
-
-// 1s, 2s, 4s, 8s, plus up to 500ms of jitter so parallel callers don't all retry in
-// lockstep and re-create the burst that caused the failure.
-const backoffMs = (attempt) => 2 ** attempt * 1000 + Math.random() * 500
-
-// ESPN 500s at random under load. A refresh makes ~90 calls, so with the old
-// 3-try/1.5s policy a single blip failed the whole run — which it did about once a week
-// (nba 2026-07-28, wnba 2026-07-25, both a lone `HTTP 500` on one team's schedule).
-//
-// Retry only what's worth retrying: a 5xx, a 429, or a network-level error. A 404 or a
-// 400 is a real answer and fails immediately rather than sleeping 15 seconds first.
-async function getJson(url, tries = 5) {
-  let lastErr
-  for (let attempt = 0; attempt < tries; attempt++) {
-    if (attempt) await sleep(backoffMs(attempt - 1))
-
-    let res
-    try {
-      res = await fetch(url)
-    } catch (err) {
-      lastErr = err // DNS, connection reset, timeout — always worth another go
-      continue
-    }
-
-    if (res.ok) return await res.json()
-    if (res.status < 500 && res.status !== 429) throw new Error(`${url}\n  HTTP ${res.status}`)
-    lastErr = new Error(`HTTP ${res.status}`)
-  }
-  throw new Error(`${url}\n  ${lastErr.message} — still failing after ${tries} attempts`)
-}
 
 function* eachDay(start, end) {
   const d = (s) => new Date(Date.UTC(+s.slice(0, 4), +s.slice(4, 6) - 1, +s.slice(6, 8), 12))
