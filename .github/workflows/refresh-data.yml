@@ -39,7 +39,7 @@ jobs:
 
       # No deps needed to fetch — the script uses Node built-ins only.
       - name: Regenerate bracket, teams, and logos
-        run: node scripts/fetch-bracket.mjs --season 2026
+        run: node scripts/fetch-bracket.mjs # season defaults to the committed teams.js SEASON
 
       - name: Summarize what changed
         id: diff

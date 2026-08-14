@@ -18,6 +18,7 @@ import { writeFile, mkdir } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { CONCURRENCY, mapLimit, fetchRetry, getJson } from './lib/fetch.mjs'
+import { SEASON as COMMITTED_SEASON } from '../src/data/teams.js'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -37,7 +38,12 @@ const argVal = (flag) => {
   const i = args.indexOf(flag)
   return i >= 0 ? args[i + 1] : undefined
 }
-const SEASON = Number(argVal('--season')) || new Date().getFullYear()
+// Default to the tournament the app is COMMITTED to (teams.js), so the unattended
+// refresh always re-fetches the bracket the site is showing; only a rollover moves
+// that target. A calendar default (bare getFullYear()) would flip to the not-yet-
+// released next tournament every January 1st — the wrong-season class that bit the
+// NBA viewer the morning after its 2026-08-13 rollover.
+const SEASON = Number(argVal('--season')) || COMMITTED_SEASON
 const WITH_LOGOS = !args.includes('--no-logos')
 // The tournament runs mid-March → early April. A generous default window is walked
 // day-by-day and filtered; the day granularity keeps each request well under the
