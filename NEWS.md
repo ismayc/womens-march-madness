@@ -4,6 +4,16 @@ A dated changelog for Women's March Madness. Each heading is a calendar
 day; bullet points capture every change made that day (features, fixes,
 data/source updates, deployment). Newest day on top.
 
+## 2026-08-16
+
+- **The data scripts now fetch from `site.web.api.espn.com`.** ESPN's edge started
+  refusing `site.api.espn.com` for requests coming from datacenter IPs — which is
+  every unattended run — while answering normally from a home connection. This
+  viewer's tournament is between editions, so nothing was broken today, but the
+  next rebuild would have failed with `HTTP 403`. Its sibling `site.web.api` serves
+  the identical routes with identical payloads and no block.
+- Nothing about the app changed — same committed data, same tests.
+
 ## 2026-08-14
 
 - **A PR branch can no longer cancel main's CI or deploy.** The whole CI

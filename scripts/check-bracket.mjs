@@ -15,7 +15,10 @@ import { fileURLToPath } from 'node:url'
 import { getJson } from './lib/fetch.mjs'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const SITE = 'https://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball'
+// site.web.api, not site.api — the latter 403s every request from a cloud IP.
+// See the note in scripts/fetch-bracket.mjs.
+const SITE =
+  'https://site.web.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball'
 const TOURNEY = /^NCAA Women's Basketball Championship/i
 
 const args = process.argv.slice(2)

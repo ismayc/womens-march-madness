@@ -24,7 +24,12 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 
 // ── League config (the ONLY block that differs men ↔ women) ─────────────────────────
 const ESPN_PATH = 'basketball/womens-college-basketball'
-const SITE = `https://site.api.espn.com/apis/site/v2/sports/${ESPN_PATH}`
+// site.web.api, NOT site.api. ESPN's edge applies a datacenter-egress block to
+// site.api only: from a GitHub runner (or any cloud IP) every site.api call answers
+// 403, while site.web.api serves the same apis/site/v2 routes with the same payloads
+// and answers 200. Diagnosed 2026-08-16 during a family-wide refresh outage.
+// Do NOT "restore" the site.api host.
+const SITE = `https://site.web.api.espn.com/apis/site/v2/sports/${ESPN_PATH}`
 // Only games whose notes headline starts with this belong to the bracket. The men's
 // build swaps "Women's" → "Men's"; everything else (round names, structure) is identical.
 const TOURNEY = /^NCAA Women's Basketball Championship/i
