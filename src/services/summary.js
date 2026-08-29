@@ -9,7 +9,7 @@
 // one request and works retroactively for any past game.
 
 const SUMMARY =
-  'https://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/summary'
+  'https://site.web.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/summary'
 
 // ── Player box score ──────────────────────────────────────────────────
 // REB already sums OREB+DREB, so drop those two to keep the wide table narrower.
