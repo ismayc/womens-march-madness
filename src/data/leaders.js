@@ -1,4 +1,4 @@
-// GENERATED — do not edit by hand.
+// Hand maintained, not generated: no script writes this file.
 // The tournament viewer does not ship a season-long player leaderboard: the public
 // byathlete feed is regular-season and league-wide (every D-I player), which is neither
 // a tournament stat nor honest to show here. Game-level leaders travel with each game
