@@ -4,6 +4,21 @@ A dated changelog for Women's March Madness. Each heading is a calendar
 day; bullet points capture every change made that day (features, fixes,
 data/source updates, deployment). Newest day on top.
 
+## 2026-09-05
+
+- **A branch that dries up on its own, with every test still green.** `GameDetail` only
+  renders its countdown while the tip is still ahead of `Date.now()`. The one test that
+  reaches that arm carries a fixed 2027 tip, so once the calendar passes it the truthy
+  branch becomes unreachable and the 100% branch gate fails at **99.9%**, while all
+  tests pass. Nothing would have been committed to cause it.
+- **Found by rehearsal, not by reading.** A harness shifts `Date` to a chosen instant and
+  runs the full coverage gate with the committed bracket untouched. This surfaced at
+  September 2027; the same exposure recurs every year between one tournament ending and
+  the next bracket landing.
+- **`test/detail.cov.test.jsx` now pins the clock** to an instant inside the 2026
+  tournament window. Re-rehearsed green at February 2027, April 2027, September 2027 and
+  March 2028.
+
 ## 2026-08-30
 
 - **Production is now checked after every deploy.** Nothing in this repo ever fetched an

@@ -24,13 +24,26 @@ const played = GAMES.find((g) => g.score && g.venue && g.broadcast)
 const open = (game, props = {}) =>
   render(<GameDetail game={game} games={GAMES} tz={TZ} onClose={() => {}} {...props} />)
 
+// Pin the clock. The upcoming-game case below carries a fixed 2027 tip, and
+// GameDetail only renders its countdown while that instant is still ahead of
+// Date.now(). Once the calendar passes it the truthy arm of that conditional
+// stops being reachable and the 100% branch gate fails, with all tests still
+// green: verified by rehearsal, this repo dropped to 99.9% branches by
+// September 2027 with nothing committed behind it.
+//
+// Only Date is faked, so real timers and waitFor keep working.
+const NOW = new Date('2026-03-20T12:00:00.000Z')
+
 beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(NOW)
   localStorage.clear()
   fetchGameSummary.mockReset()
   fetchGameSummary.mockResolvedValue(null)
 })
 
 afterEach(() => {
+  vi.useRealTimers()
   cleanup()
 })
 
