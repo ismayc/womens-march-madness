@@ -1,7 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { SERVICE_CATALOG } from '../utils/watch.js'
+import { LEAGUE } from '../config/league.js'
 
-const KEY = 'mmw:services'
+const KEY = `${LEAGUE.storageKey}:services`
 const VALID = new Set(SERVICE_CATALOG.map((s) => s.key))
 const ServicesCtx = createContext(null)
 

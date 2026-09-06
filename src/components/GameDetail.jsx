@@ -9,6 +9,7 @@ import { useServices } from '../context/services.jsx'
 import { useModalA11y } from '../hooks/useModalA11y.js'
 import { PlayerBox, TeamStatsSection, InjuryReport, WinProbSection } from './GameSummary.jsx'
 import TeamLogo from './TeamLogo.jsx'
+import { LEAGUE } from '../config/league.js'
 
 const one = (n) => n.toFixed(1)
 
@@ -27,8 +28,14 @@ function LineScore({ game, hideScores }) {
   const periods = Math.max(home.length, away.length)
   if (!periods) return null
 
-  // Women's college basketball is four quarters, then overtime periods.
-  const label = (i) => (i < 4 ? ['1st', '2nd', '3rd', '4th'][i] : periods - 4 > 1 ? `OT${i - 3}` : 'OT')
+  // Regulation is LEAGUE.regulationPeriods long, then overtime periods.
+  const { regulationPeriods: REG, overtimeLabel: OT, periodLabels } = LEAGUE
+  const label = (i) =>
+    i < REG
+      ? periodLabels[i].toLowerCase()
+      : periods - REG > 1
+        ? `${OT}${i - REG + 1}`
+        : OT
   const sum = (arr) => arr.reduce((a, b) => a + b, 0)
 
   const Row = ({ abbr, vals, total }) => (
@@ -54,7 +61,7 @@ function LineScore({ game, hideScores }) {
 
   return (
     <>
-      <h4 className="md-sub">By quarter</h4>
+      <h4 className="md-sub">By {LEAGUE.periodNoun}</h4>
       <div className="table-scroll">
         <table className="linescore">
           <thead>

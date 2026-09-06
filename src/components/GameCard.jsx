@@ -4,6 +4,7 @@ import { watchableServices, broadcastNotBadged } from '../utils/watch.js'
 import { useFollow } from '../context/follow.jsx'
 import { useServices } from '../context/services.jsx'
 import TeamLogo from './TeamLogo.jsx'
+import { LEAGUE } from '../config/league.js'
 
 // Halftime and end-of-quarter are stable states; a running clock is not. Falls back
 // to ESPN's own label when the period is unknown.
@@ -13,9 +14,10 @@ export function livePeriod(game) {
   if (/end/i.test(label)) return label.toUpperCase()
   const p = game.period
   if (!p) return label.toUpperCase() || 'LIVE'
-  // Women's college basketball: four quarters, then overtime.
-  if (p > 4) return p - 4 > 1 ? `OT${p - 4}` : 'OT'
-  return ['1ST', '2ND', '3RD', '4TH'][p - 1] || 'LIVE'
+  // Regulation is LEAGUE.regulationPeriods long, then overtime.
+  const { regulationPeriods: REG, overtimeLabel: OT, periodLabels } = LEAGUE
+  if (p > REG) return p - REG > 1 ? `${OT}${p - REG}` : OT
+  return periodLabels[p - 1] || 'LIVE'
 }
 
 function Side({ abbr, score, winner, hideScores }) {

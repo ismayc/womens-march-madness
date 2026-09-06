@@ -1,11 +1,11 @@
+import { LEAGUE } from '../config/league.js'
 // Live overlay.
 //
 // The committed schedule already carries every completed result, so this only has to
 // cover games that are in progress or finished since the last data refresh. Keyless
 // and CORS-open — no backend, no .env.
 
-const SCOREBOARD =
-  'https://site.web.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/scoreboard'
+const SCOREBOARD = `https://site.web.api.espn.com/apis/site/v2/sports/${LEAGUE.espnPath}/scoreboard`
 
 // ESPN buckets a `dates=YYYYMMDD` query by the US-EASTERN day, not UTC (verified:
 // dates=20260728 returns instants up to 07-29T02:00Z). Anchoring the window on the
@@ -48,8 +48,11 @@ function normalizeEvent(ev) {
     // a game that finishes between data refreshes must supply one too. Final only —
     // a live lead is provisional and must not advance anything.
     winner: st.completed && hasScore ? (hs > as ? 'home' : 'away') : undefined,
-    // Women's college regulation is four quarters (period 4); anything beyond is overtime.
-    ot: c.status?.period > 4 ? c.status.period - 4 : undefined,
+    // Regulation is LEAGUE.regulationPeriods long; anything beyond it is overtime.
+    ot:
+      c.status?.period > LEAGUE.regulationPeriods
+        ? c.status.period - LEAGUE.regulationPeriods
+        : undefined,
   }
 }
 

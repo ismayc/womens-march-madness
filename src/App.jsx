@@ -16,6 +16,7 @@ import Toasts from './components/Toasts.jsx'
 import ServicesModal from './components/ServicesModal.jsx'
 import { detectEvents, eventKey } from './services/alerts.js'
 import TeamLogo from './components/TeamLogo.jsx'
+import { LEAGUE } from './config/league.js'
 
 const VIEWS = [
   { id: 'bracket', label: '🏀 Bracket' },
@@ -24,7 +25,7 @@ const VIEWS = [
 
 const LIVE_REFRESH_MS = 30_000
 const IDLE_REFRESH_MS = 120_000
-const NS = 'mmw' // localStorage namespace — women's March Madness
+const NS = LEAGUE.storageKey // localStorage namespace
 
 // The "When" quick filter. Exclusive — a game is in exactly one of these at a time —
 // so clicking the active chip clears it rather than stacking a second bucket.
@@ -234,7 +235,7 @@ export default function App() {
       <header className="top">
         <div className="brand">
           <h1>
-            Women's March Madness <span className="season">{SEASON}</span>
+            {LEAGUE.name} <span className="season">{SEASON}</span>
           </h1>
           <p className="tagline">
             The NCAA Division I women's tournament bracket, in your timezone
@@ -513,7 +514,7 @@ export default function App() {
           {updatedAt && (
             <span className="dim">
               Updated{' '}
-              {updatedAt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+              {updatedAt.toLocaleTimeString(LEAGUE.locale, { hour: 'numeric', minute: '2-digit' })}
             </span>
           )}
         </div>
