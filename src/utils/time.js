@@ -77,9 +77,10 @@ export function dayLabel(key, tz, now = new Date()) {
   }).format(d)
 }
 
-// A college game runs ~2h (two 20-minute halves plus stoppages and TV); treat that as
-// the window in which a game with no live feed should still be considered possibly in
-// progress.
+// The women's college game is four 10-minute QUARTERS, not the two 20-minute halves
+// this comment used to describe: that was the men's game, inherited when this repo was
+// scaffolded from its sibling. Both run 40 minutes of clock, so the 2.25h value was
+// right by luck; the reasoning was not. The window itself now lives in the config.
 const GAME_MS = LEAGUE.gameLengthMs
 
 export function liveState(game, now = Date.now()) {

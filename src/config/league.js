@@ -48,7 +48,8 @@ export const LEAGUE = {
   overtimeLabel: 'OT',
   homeAwaySep: 'vs',
   tipoffLabel: 'Tipoff',
-  // "Close finish" threshold: one possession plus the free throw.
+  // "Close finish" threshold. Five points is the NBA's own clutch-time definition and
+  // the convention the basketball siblings follow; the NFL uses 8, one score in football.
   closeMargin: 5,
 
   // ── Time ────────────────────────────────────────────────────────────────────
