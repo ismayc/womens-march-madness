@@ -6,6 +6,27 @@ data/source updates, deployment). Newest day on top.
 
 ## 2026-09-06
 
+- **Every league fact now lives in one file, `src/config/league.js`.** The ESPN path, the
+  storage prefix, the period vocabulary, the live-overlay window, the `.ics` identity, the
+  deploy host and the locale were inline literals spread across 15 files; they are now one
+  module those 15 files import. Two rules the file is written to: every field has a real
+  consumer in `src/`, and structure stays out, so seeding, regions and round names remain
+  where they are generated. The pattern comes from `the-nfl-schedule`, the only sibling
+  that already had it. The move changed no behavior: all 397 existing tests passed
+  untouched.
+- **A new test holds the files a module cannot import.** `index.html`, the manifest and
+  `package.json` state the app's identity in static files, and the pre-paint theme script
+  has to stay a blocking classic script or the wrong palette flashes. So the duplication
+  stays and `test/chrome-identity.test.js` checks it: the page title, the theme color
+  across CSS, meta tag and manifest, the manifest name, and the four spellings of the
+  deploy slug. It also pins the theme key to `LEAGUE.storageKey`, which closes a real gap:
+  `guards.test.js` only sees single-quoted literals, so the template literals this change
+  introduced would otherwise have been invisible to it.
+- **Corrected the reasoning behind two constants.** `time.js` justified the live-overlay
+  window with "two 20-minute halves", which is the men's game; the women's is four
+  10-minute quarters. Both run 40 minutes, so the value was right by luck. And
+  `closeMargin` now says where 5 comes from, the NBA's clutch-time definition, rather than
+  claiming it is one possession.
 - **Box scores are built for a phone now.** Three changes, all below 560px and none of
   them touching the desktop table. The four columns that answer "who played well"
   (MIN, PTS, REB, AST) show by default, which fits with no sideways scroll at all, and
