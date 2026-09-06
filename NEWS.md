@@ -4,6 +4,16 @@ A dated changelog for Women's March Madness. Each heading is a calendar
 day; bullet points capture every change made that day (features, fixes,
 data/source updates, deployment). Newest day on top.
 
+## 2026-09-06
+
+- **Box scores are built for a phone now.** Three changes, all below 560px and none of
+  them touching the desktop table. The four columns that answer "who played well"
+  (MIN, PTS, REB, AST) show by default, which fits with no sideways scroll at all, and
+  **More stats** brings the other nine back for anyone who wants the splits. The column
+  labels stay pinned while the rows scroll under them. And when the table does scroll
+  sideways, a soft shadow appears at whichever edge has more table beyond it. Ported
+  from the FIBA viewer via the WNBA one, where it was built and measured first.
+
 ## 2026-09-05 (later)
 
 - **The visual identity is now the family's results-board system.** The old look was a set
