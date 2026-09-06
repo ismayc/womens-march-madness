@@ -2,18 +2,18 @@
    that index.html stamps on <html> before first paint. */
 :root,
 :root[data-theme='dark'] {
-  --bg: #0e1117;
-  --bg-soft: #161b25;
-  --card: #1a2029;
-  --card-hover: #212936;
-  --border: #2a3341;
-  --text: #e9edf3;
-  --text-dim: #98a3b3;
-  --text-faint: #69748a;
+  --bg: #15171b;
+  --bg-soft: #1b1e23;
+  --card: #1b1e23;
+  --card-hover: #23262d;
+  --border: #2f333b;
+  --text: #f0f1f3;
+  --text-dim: #a7adb8;
+  --text-faint: #767d89;
 
   /* Tournament purple (the women's icon ground is #2d0d4a); white-ink safe on dark (5.7:1). */
-  --accent: #7c3aed;
-  --accent-ink: #ffffff;
+  --accent: #a78bfa;
+  --accent-ink: #1a1030;
   --accent-soft: rgba(124, 58, 237, 0.16);
   --seed: #ff7a29; /* the icon's orange — seed pips + bracket accents */
   --live: #ff5a3c;
@@ -21,28 +21,41 @@
   --loss: #ff6b6b;
   --gold: #f4c542;
 
-  --radius: 14px;
+  --radius: 2px;
   --shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-  --page-bg: radial-gradient(1100px 560px at 85% -12%, #2d0d4a 0%, var(--bg) 58%);
+  --page-bg: var(--bg);
 
   /* Condensed view strip: one fixed-height row (plus the notch inset on phones),
      declared as a token so sticky headers can offset beneath it and
      scroll-margins can clear it without any JS measuring. */
   --view-strip-h: calc(44px + env(safe-area-inset-top, 0px));
+
+  /* Added with the family's results-board system: a rule color distinct from
+     the border, a structural blue for day bands and round plates, and flat
+     signal colors that mean an outcome and nothing else. */
+  --rule: #3a3f49;
+  --court: #6f9fe0;
+  --court-deep: #2e5fa3;
+  --through: #4bb37a;
+  --out: #e06561;
+  --silver: #aeb6c2;
+  --font: 'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --shadow: none;
+  --shadow-float: 0 18px 40px rgba(0, 0, 0, 0.5);
 }
 
 :root[data-theme='light'] {
-  --bg: #f1f4f9;
-  --bg-soft: #e7ecf4;
+  --bg: #e7e8ea;
+  --bg-soft: #f4f5f6;
   --card: #ffffff;
-  --card-hover: #f6f8fc;
-  --border: #d8e0ec;
-  --text: #131922;
-  --text-dim: #5a6675;
-  --text-faint: #8b96a6;
+  --card-hover: #f4f5f6;
+  --border: #ccced3;
+  --text: #101317;
+  --text-dim: #4a515c;
+  --text-faint: #767d89;
 
   --accent: #6d28d9;
-  --accent-ink: #fff;
+  --accent-ink: #ffffff;
   --accent-soft: rgba(109, 40, 217, 0.1);
   --seed: #c85a12;
   --live: #d1382a;
@@ -51,7 +64,16 @@
   --gold: #a9760a;
 
   --shadow: 0 4px 16px rgba(20, 35, 60, 0.1);
-  --page-bg: radial-gradient(1100px 560px at 85% -12%, #ece1f7 0%, var(--bg) 58%);
+  --page-bg: var(--bg);
+
+  --rule: #b9bcc3;
+  --court: #2e5fa3;
+  --court-deep: #1e4278;
+  --through: #17683f;
+  --out: #a62a25;
+  --silver: #5b6270;
+  --shadow: none;
+  --shadow-float: 0 18px 40px rgba(16, 19, 23, 0.18);
 }
 
 * {
@@ -62,10 +84,24 @@ body {
   margin: 0;
   background: var(--bg);
   background-image: var(--page-bg);
-  background-attachment: fixed;
   color: var(--text);
-  font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font: 15px/1.5 var(--font);
+  font-synthesis: none;
   -webkit-font-smoothing: antialiased;
+}
+
+/* The display voice: the SAME family, pushed wide and heavy. One typeface used
+   at two extremes reads as two, without the mismatch of an actual second face.
+   Reserved for numerals and for headings that name a thing. */
+.brand h1,
+.day-fold,
+.time,
+.side-score,
+.tot,
+.st-pts {
+  font-stretch: 118%;
+  font-weight: 800;
+  letter-spacing: -0.015em;
 }
 
 .app {
@@ -107,6 +143,8 @@ h3 {
 }
 
 /* ── Header ─────────────────────────────────────────────────────────── */
+/* The masthead of a results board: the name set wide and heavy on the same left
+   edge every row below it uses, over a single heavy rule. */
 .top {
   display: flex;
   align-items: flex-start;
@@ -114,11 +152,14 @@ h3 {
   gap: 16px;
   flex-wrap: wrap;
   margin-bottom: 18px;
+  border-bottom: 3px solid var(--text);
+  padding-bottom: 12px;
 }
 
 .brand h1 {
-  font-size: 26px;
-  letter-spacing: -0.02em;
+  font-size: clamp(22px, 5vw, 30px);
+  letter-spacing: -0.025em;
+  line-height: 1.02;
 }
 
 .season {
@@ -179,7 +220,7 @@ select,
   color: var(--text);
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 2px;
   padding: 7px 12px;
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s, color 0.15s;
@@ -219,11 +260,28 @@ select:hover,
   margin-bottom: 16px;
 }
 
-.view-btn.on {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-ink);
-  font-weight: 600;
+/* Views are TABS on the masthead rule, not filled capsules: a rule carries the
+   state, the same way a day band does. The .views row shares the control
+   styling above, so the tab treatment is stated here rather than fought for. */
+.views .view-btn {
+  background: transparent;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+  margin-bottom: -3px;
+  color: var(--text-dim);
+}
+.views .view-btn:hover {
+  background: transparent;
+  color: var(--text);
+  border-bottom-color: var(--rule);
+}
+.view-btn.on,
+.views .view-btn.on {
+  background: transparent;
+  border-bottom-color: var(--accent);
+  color: var(--accent);
+  font-weight: 700;
 }
 
 /* ── Condensed view strip ───────────────────────────────────────────────
@@ -300,13 +358,13 @@ select:hover,
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  border-radius: 999px;
+  border-radius: 2px;
 }
 
 /* Count of what's hidden behind a toggle. */
 .chip-count {
   background: var(--bg-soft);
-  border-radius: 999px;
+  border-radius: 2px;
   padding: 0 6px;
   font-size: 11px;
   color: var(--text-dim);
@@ -326,7 +384,7 @@ select:hover,
   border-radius: 0;
 }
 .seg button:first-child {
-  border-radius: 10px 0 0 10px;
+  border-radius: 2px 0 0 10px;
 }
 .seg button:last-child {
   border-radius: 0 10px 10px 0;
@@ -516,7 +574,7 @@ select:hover,
 .badge {
   font-size: 11px;
   padding: 1px 5px;
-  border-radius: 6px;
+  border-radius: 2px;
   line-height: 1.4;
 }
 .badge-in {
@@ -633,7 +691,7 @@ select:hover,
 .nm-countdown b {
   background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: 7px;
+  border-radius: 2px;
   padding: 3px 7px;
   font-size: 1.05rem;
   font-variant-numeric: tabular-nums;
@@ -649,7 +707,7 @@ select:hover,
   width: 100%;
   background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 2px;
   padding: 8px 12px;
   cursor: pointer;
   color: inherit;
@@ -665,7 +723,7 @@ select:hover,
   color: var(--accent-ink);
   border: none;
   padding: 8px 14px;
-  border-radius: 9px;
+  border-radius: 2px;
   font-weight: 600;
   font-size: 0.82rem;
   cursor: pointer;
@@ -683,10 +741,10 @@ select:hover,
   align-items: baseline;
   justify-content: space-between;
   gap: 10px;
-  font-size: 14px;
+  font-size: 15px;
   padding-bottom: 6px;
-  margin-bottom: 10px;
-  border-bottom: 1px solid var(--border);
+  margin-bottom: 0;
+  border-bottom: 2px solid var(--court);
 }
 
 .day.is-today .day-head {
@@ -733,26 +791,32 @@ select:hover,
   gap: 10px;
 }
 
+/* A row, not a card. The left column is the scoreboard rail: tip-off in the
+   viewer's own zone, set big and tabular, divided from the game by a rule that
+   runs the full height. Ten rows read as one board rather than ten boxes. */
 .game {
   display: grid;
-  grid-template-columns: 92px 1fr;
-  gap: 14px;
+  grid-template-columns: 96px 1fr;
+  gap: 16px;
   align-items: center;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 12px 14px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  padding: 13px 4px 13px 0;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background 0.12s;
 }
 
 .game:hover {
   background: var(--card-hover);
-  border-color: var(--accent);
 }
 
+/* Live is the one state worth interrupting the grid for. */
 .game.state-live {
-  border-color: var(--live);
+  box-shadow: inset 3px 0 0 var(--live);
+  padding-left: 12px;
+  background: var(--card);
 }
 
 .game.state-void {
@@ -762,12 +826,20 @@ select:hover,
 .game-when {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  align-items: flex-end;
+  text-align: right;
+  gap: 1px;
+  padding-right: 16px;
+  border-right: 1px solid var(--rule);
+  align-self: stretch;
+  justify-content: center;
   font-variant-numeric: tabular-nums;
 }
 
 .time {
-  font-weight: 600;
+  font-size: 20px;
+  line-height: 1.05;
+  white-space: nowrap;
 }
 
 .zone,
@@ -833,8 +905,8 @@ select:hover,
 }
 
 .side-score {
-  font-size: 19px;
-  font-weight: 700;
+  font-size: 23px;
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
   color: var(--text-dim);
   margin-inline: auto 0;
@@ -916,7 +988,7 @@ select:hover,
 
 .watch-chip {
   border: 1px solid color-mix(in srgb, var(--win) 45%, transparent);
-  border-radius: 999px;
+  border-radius: 2px;
   padding: 1px 7px;
   font-weight: 600;
   letter-spacing: 0.01em;
@@ -981,7 +1053,7 @@ select:hover,
   padding: 11px 12px;
   background: var(--bg-soft);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 2px;
   text-align: left;
   font: inherit;
   color: inherit;
@@ -1066,7 +1138,7 @@ select:hover,
   font: inherit;
   font-size: 11.5px;
   padding: 3px 8px;
-  border-radius: 7px;
+  border-radius: 2px;
   border: 1px solid var(--border);
   background: var(--bg-soft);
   color: var(--text-dim);
@@ -1372,7 +1444,7 @@ select:hover,
   padding: 6px 7px;
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 9px;
+  border-radius: 2px;
   cursor: pointer;
   font: inherit;
   color: inherit;
@@ -1442,7 +1514,7 @@ select:hover,
 .banner {
   background: var(--accent-soft);
   border: 1px solid var(--accent);
-  border-radius: 10px;
+  border-radius: 2px;
   padding: 9px 13px;
   font-size: 13px;
   margin: 0 0 16px;
@@ -1510,7 +1582,7 @@ select:hover,
 .bx-series {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 11px;
+  border-radius: 2px;
   padding: 7px 8px 5px;
 }
 
@@ -1723,7 +1795,7 @@ select:hover,
   place-items: center;
   gap: 4px;
   padding: 14px;
-  border-radius: 14px;
+  border-radius: 2px;
   border: 2px solid var(--gold);
   background: var(--card);
 }
@@ -1894,7 +1966,7 @@ select:hover,
   white-space: nowrap;
   padding: 9px 13px;
   border: 1px solid var(--border);
-  border-radius: 999px;
+  border-radius: 2px;
   background: var(--card);
   color: var(--text-dim);
   font-size: 0.82rem;
@@ -1966,7 +2038,7 @@ select:hover,
   font-size: 15px;
   cursor: pointer;
   padding: 4px 6px;
-  border-radius: 6px;
+  border-radius: 2px;
 }
 
 .modal-x:hover {
@@ -2001,7 +2073,7 @@ select:hover,
   color: var(--accent-ink);
   text-decoration: none;
   padding: 6px 12px;
-  border-radius: 8px;
+  border-radius: 2px;
   font-size: 0.8rem;
   font-weight: 600;
 }
@@ -2010,7 +2082,7 @@ select:hover,
   border: 1px solid var(--border);
   color: var(--text-dim);
   padding: 6px 12px;
-  border-radius: 8px;
+  border-radius: 2px;
   font-size: 0.8rem;
   cursor: pointer;
   text-decoration: none;
@@ -2023,7 +2095,7 @@ select:hover,
   border: 1px solid var(--border);
   color: var(--text);
   padding: 9px 13px;
-  border-radius: 9px;
+  border-radius: 2px;
   font-size: 0.82rem;
   cursor: pointer;
 }
@@ -2060,7 +2132,7 @@ select:hover,
   gap: 8px;
   padding: 9px 11px;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 2px;
   cursor: pointer;
   background: var(--card);
   transition: border-color 0.15s, background 0.15s;
@@ -2162,7 +2234,7 @@ select:hover,
   color: var(--accent);
   background: var(--accent-soft);
   border: 1px solid var(--accent);
-  border-radius: 999px;
+  border-radius: 2px;
   padding: 3px 10px;
   cursor: pointer;
   white-space: nowrap;
@@ -2300,7 +2372,7 @@ select:hover,
 }
 .lu-side {
   background: var(--bg-soft);
-  border-radius: 9px;
+  border-radius: 2px;
   padding: 8px 10px;
   min-width: 0;
 }
@@ -2479,7 +2551,7 @@ select:hover,
 }
 .inj-side {
   background: var(--bg-soft);
-  border-radius: 9px;
+  border-radius: 2px;
   padding: 8px 10px;
   min-width: 0;
 }
@@ -2528,7 +2600,7 @@ select:hover,
   display: block;
   margin-top: 4px;
   background: var(--bg-soft);
-  border-radius: 8px;
+  border-radius: 2px;
 }
 .wp-area {
   fill: var(--accent-soft);
@@ -2627,7 +2699,7 @@ select:hover,
   align-items: center;
   gap: 1px;
   background: var(--bg-soft);
-  border-radius: 9px;
+  border-radius: 2px;
   padding: 8px 4px;
 }
 
@@ -2708,7 +2780,7 @@ select:hover,
 
 .gl-team {
   background: var(--bg-soft);
-  border-radius: 9px;
+  border-radius: 2px;
   padding: 8px 10px;
 }
 
@@ -2769,7 +2841,7 @@ select:hover,
   align-items: center;
   gap: 10px;
   padding: 5px 8px;
-  border-radius: 8px;
+  border-radius: 2px;
   background: var(--bg-soft);
   font-size: 13px;
 }
@@ -2859,7 +2931,7 @@ select:hover,
   gap: 1px;
   padding: 8px 4px;
   background: var(--bg-soft);
-  border-radius: 9px;
+  border-radius: 2px;
 }
 
 .tp-stat-v {
@@ -2884,7 +2956,7 @@ select:hover,
 .tp-chip {
   width: 25px;
   height: 25px;
-  border-radius: 7px;
+  border-radius: 2px;
   border: 0;
   font: inherit;
   font-size: 11.5px;
@@ -2916,7 +2988,7 @@ select:hover,
   gap: 10px;
   padding: 5px 8px;
   background: var(--bg-soft);
-  border-radius: 8px;
+  border-radius: 2px;
   font-size: 13px;
 }
 
@@ -2963,7 +3035,7 @@ select:hover,
   background: var(--card);
   border: 1px solid var(--border);
   border-left: 3px solid var(--accent);
-  border-radius: 10px;
+  border-radius: 2px;
   box-shadow: var(--shadow);
   animation: toast-in 0.22s ease-out;
 }
@@ -3204,7 +3276,7 @@ select:hover,
 }
 .mm-tab {
   padding: 7px 14px;
-  border-radius: 999px;
+  border-radius: 2px;
   border: 1px solid var(--border);
   background: var(--card);
   color: var(--text-dim);
@@ -3259,7 +3331,7 @@ select:hover,
   position: relative;
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 2px;
   overflow: hidden;
 }
 .mm-match.is-live {
@@ -3353,7 +3425,7 @@ select:hover,
   flex-wrap: wrap;
   padding: 8px 10px;
   border: 1px dashed var(--border);
-  border-radius: 10px;
+  border-radius: 2px;
   background: var(--bg-soft);
 }
 .mm-ff4-label {
