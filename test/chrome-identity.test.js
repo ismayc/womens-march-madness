@@ -46,8 +46,10 @@ describe('the browser chrome agrees with src/config/league.js', () => {
     expect(key).toBe(`${LEAGUE.storageKey}:theme`)
   })
 
-  it('names the app the same way in the manifest', () => {
-    expect(JSON.parse(read('public/manifest.webmanifest')).name).toBe(LEAGUE.name)
+  it('names the installed app with the full product title', () => {
+    // The manifest's `name` is what a phone shows under the icon, so it is the full
+    // title, not LEAGUE.name (which is the short league label used in body copy).
+    expect(JSON.parse(read('public/manifest.webmanifest')).name).toBe(LEAGUE.title)
   })
 
   it('ships under the slug the .ics identity is built from', () => {
