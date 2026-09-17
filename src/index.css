@@ -3360,9 +3360,9 @@ select:hover,
 }
 
 /* ── Tournament bracket ─────────────────────────────────────────────────────────
-   Four regional sub-brackets and a Final Four, one panel at a time. Rounds are
-   connected by vertical alignment (flex space-around), not drawn elbows — the
-   family's world-cup knockout pattern. No radial layout. */
+   Four regional sub-brackets and a Final Four, one panel at a time. Rounds trace
+   through drawn elbow connectors between the flex:1 cells of adjacent columns.
+   No radial layout. */
 .mm-bracket {
   display: flex;
   flex-direction: column;
@@ -3413,17 +3413,17 @@ select:hover,
    its two feeders. Scrolls horizontally on a phone rather than squeezing. */
 .mm-cols {
   display: flex;
-  gap: 10px;
+  gap: 32px;
   overflow-x: auto;
   padding-bottom: 6px;
 }
 .mm-col {
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
-  gap: 10px;
   min-width: 190px;
   flex: 1;
+  position: relative;
+  padding-top: 26px;
 }
 .mm-col-h {
   margin: 0 0 2px;
@@ -3432,12 +3432,60 @@ select:hover,
   text-transform: uppercase;
   color: var(--text-faint);
   text-align: center;
-  position: sticky;
-  top: 0;
 }
-/* Pin beneath the condensed view strip instead of behind it. */
-.nav-away .mm-col-h {
-  top: var(--view-strip-h);
+/* Region round header pulled out of flow so it never eats a flex slot: with the
+   header in flow the columns fanned unevenly and a child no longer lined up with
+   its feeders. Out of flow, every column's cells distribute over the same
+   height. Scoped to region columns so the Final Four headers stay in flow. */
+.mm-col > .mm-col-h {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: 0;
+}
+/* Each match sits in a flex:1 cell, so the round distributes its matches evenly
+   and a child cell centers on the boundary between its two feeder cells. The
+   elbow connectors are drawn as percentage-height borders on the cells: 50% of
+   a cell always reaches the pair boundary, so the joins stay aligned at any
+   width or column height without hard-coded offsets. */
+.mm-cell {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+/* Right side of each feeder cell: a horizontal stub plus the vertical spine
+   that meets its sibling's spine at the child's midpoint (top cell reaches
+   down, bottom cell reaches up). */
+.mm-col:not(:last-child) .mm-cell::after {
+  content: '';
+  position: absolute;
+  right: -16px;
+  width: 16px;
+  height: 50%;
+  pointer-events: none;
+}
+.mm-col:not(:last-child) .mm-cell:nth-child(odd of .mm-cell)::after {
+  top: 50%;
+  border-top: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+.mm-col:not(:last-child) .mm-cell:nth-child(even of .mm-cell)::after {
+  bottom: 50%;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+/* Left side of each child cell: the horizontal stub that receives the spine. */
+.mm-col:not(:first-child) .mm-cell::before {
+  content: '';
+  position: absolute;
+  left: -16px;
+  width: 16px;
+  top: 50%;
+  border-top: 1px solid var(--border);
+  pointer-events: none;
 }
 .mm-match {
   position: relative;

@@ -4,6 +4,16 @@ A dated changelog for Women's March Madness. Each heading is a calendar
 day; bullet points capture every change made that day (features, fixes,
 data/source updates, deployment). Newest day on top.
 
+## 2026-09-17
+
+- **The region bracket now draws elbow connectors between rounds.** Each match
+  sits in a `flex:1` cell so a round distributes its matches evenly, a child
+  centers on the boundary between its two feeders, and 1px elbows drawn as
+  percentage-height borders trace Round of 64 through the Elite Eight at any
+  width. The round header was pulled out of flow so it no longer eats a flex
+  slot and skews the alignment (it no longer stays stuck while scrolling, the
+  accepted trade). The Final Four panel is unchanged.
+
 ## 2026-09-10
 
 - **Fixed: the game-detail popup could not be closed on mobile.** The modal was sized and

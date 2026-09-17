@@ -87,7 +87,10 @@ function Region({ region, onPick, hideScores }) {
             {region[key].map((s, i) => (
               // Key on position: slot ids can collide (two "Winner|Winner" projected
               // shells share an id), and position is stable within a fixed-length column.
-              <Match key={i} slot={s} onPick={onPick} hideScores={hideScores} />
+              // The cell wrapper is the anchor the elbow connectors draw from.
+              <div className="mm-cell" key={i}>
+                <Match slot={s} onPick={onPick} hideScores={hideScores} />
+              </div>
             ))}
           </div>
         ))}
