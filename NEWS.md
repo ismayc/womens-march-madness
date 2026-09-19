@@ -4,6 +4,17 @@ A dated changelog for Women's March Madness. Each heading is a calendar
 day; bullet points capture every change made that day (features, fixes,
 data/source updates, deployment). Newest day on top.
 
+## 2026-09-18
+
+- **Player names in the Game leaders block are no longer cut on a phone.** The two teams
+  were fixed halves, which left a name 81px on a phone, so anything past about 12
+  characters ended in an ellipsis ("B. Laney-Hamilton" needs 103px, "S. Gilgeous-Alexander"
+  125px), about 1 leader row in 20. The teams now sit side by side only
+  when each half can be 220px (the desktop pop-out) and stack otherwise, and a row is a
+  wrapping flex line in which the name is never truncated. Found on the NFL viewer, where
+  long stat lines made it severe, and fixed the same way across the family. CSS only.
+  Checked in the browser on the WNBA viewer from 320px to 900px.
+
 ## 2026-09-17
 
 - **The region bracket now draws elbow connectors between rounds.** Each match
