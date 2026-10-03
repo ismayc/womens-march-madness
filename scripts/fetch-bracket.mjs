@@ -132,6 +132,11 @@ function normalizeEvent(ev) {
   return {
     id: ev.id,
     tip: new Date(ev.date).toISOString(),
+    // ... EXCEPT when there is no time to emit. `timeValid: false` means ESPN has only
+    // set the DATE, and this is its placeholder for it: midnight ET that day. Stored as
+    // a real instant it becomes a time nobody announced, on the day before the game
+    // anywhere west of Eastern. See sports-viewer-meta/docs/LINEAGES.md §6.
+    timeTbd: c.timeValid === false || undefined,
     round,
     region,
     home: home.team.abbreviation,

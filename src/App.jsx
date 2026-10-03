@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { GAMES } from './data/schedule.js'
 import { SEASON, TEAMS } from './data/teams.js'
-import { detectTimezone, timezoneOptions, dayKey, todayKey, whenBucket } from './utils/time.js'
+import { detectTimezone, timezoneOptions, todayKey, whenBucket, gameDayKey } from './utils/time.js'
 import { readState, writeState } from './utils/urlState.js'
 import { applyLive, fetchLive, liveCount } from './services/espn.js'
 import { watchableServices } from './utils/watch.js'
@@ -205,7 +205,7 @@ export default function App() {
     const today = todayKey(tz)
     const keys = new Set()
     for (const g of scheduleGames) {
-      const key = dayKey(g.tip, tz)
+      const key = gameDayKey(g, tz)
       if (key < today) keys.add(key)
     }
     return keys.size
