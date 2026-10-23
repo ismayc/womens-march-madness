@@ -63,6 +63,16 @@ describe('watchableServices', () => {
     expect(watchableServices([], ['youtubetv'])).toEqual([])
   })
 
+  it('matches a network whatever case ESPN spells it in', () => {
+    const keys = ['youtubetv', 'sling', 'espnplus']
+    const asWritten = labels(['ESPN2'], keys)
+    expect(asWritten).toEqual(['ESPN+', 'YouTube TV', 'Sling TV'])
+    expect(labels(['espn2'], keys)).toEqual(asWritten)
+    expect(labels(['Espn2'], keys)).toEqual(asWritten)
+    // A badge label in a different case still counts as badged.
+    expect(broadcastNotBadged(['PEACOCK', 'NBC'], [{ label: 'Peacock' }])).toEqual(['NBC'])
+  })
+
   it('exposes a catalog keyed for lookup', () => {
     expect(SERVICE_CATALOG.length).toBeGreaterThanOrEqual(5)
     expect(SERVICE_BY_KEY.youtubetv.label).toBe('YouTube TV')

@@ -18,11 +18,17 @@ const ESPN2 = 'ESPN2'
 const ESPNU = 'ESPNU'
 const ESPNEWS = 'ESPNEWS'
 
+// Matching is case-insensitive because ESPN changes the case of a network's name without
+// notice (the NFL feed turned "FOX" into "Fox" on October 5, 2026, and exact matching then
+// read every Fox game as on no service).
+const nameKey = (n) => String(n).toLowerCase()
+const nameSet = (names) => new Set(names.map(nameKey))
+
 // carries(...names) → a matcher that's true when a game's broadcast list names any
 // of them.
 const carries = (...names) => {
-  const set = new Set(names)
-  return (broadcast) => broadcast.some((n) => set.has(n))
+  const set = nameSet(names)
+  return (broadcast) => broadcast.some((n) => set.has(nameKey(n)))
 }
 
 // Ordered streaming-first, then live-TV bundles. This is also the display order for
@@ -46,8 +52,8 @@ export const SERVICE_BY_KEY = Object.fromEntries(SERVICE_CATALOG.map((s) => [s.k
 // broadcast name, so their underlying network (ESPN, NBC, …) is left in place.
 export function broadcastNotBadged(broadcast, watched) {
   if (!broadcast?.length) return []
-  const shown = new Set((watched || []).map((s) => s.label))
-  return broadcast.filter((b) => !shown.has(b))
+  const shown = nameSet((watched || []).map((s) => s.label))
+  return broadcast.filter((b) => !shown.has(nameKey(b)))
 }
 
 // The viewer's selected services (by key) that carry this game, in catalog order.
