@@ -83,6 +83,14 @@ describe('Bracket — projected feeders and TBD team lines', () => {
     expect(otLabels).toContain('OT')
   })
 
+  // An OT tag says the game was tied after regulation, so spoiler-free mode drops it.
+  it('hides the OT tag in spoiler-free mode', async () => {
+    const utils = render(<Bracket games={games} hideScores />)
+    await userEvent.click(utils.getByRole('tab', { name: 'Regional 1' }))
+    expect(utils.container.querySelector('.mm-ot')).toBeNull()
+    expect(utils.container.querySelector('.mm-live')).toBeTruthy()
+  })
+
   it('shows TBD for projected Round-of-64 slots with no feeder labels', async () => {
     const { container } = await openSouth()
     const projected = container.querySelectorAll('.mm-match.is-proj')

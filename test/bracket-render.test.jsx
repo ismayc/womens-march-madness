@@ -52,6 +52,17 @@ describe('Bracket with a completed tournament', () => {
     await userEvent.click(screen.getByRole('tab', { name: 'Regional 3' }))
     expect(container.querySelector('.mm-score')).toBeNull()
   })
+
+  // A bold winner row gives the result away as surely as the score does.
+  it('puts no winner highlight on a team in spoiler-free mode', async () => {
+    const shown = render(<Bracket games={GAMES} />)
+    await userEvent.click(screen.getByRole('tab', { name: 'Regional 3' }))
+    expect(shown.container.querySelector('.mm-team.won')).toBeTruthy()
+    shown.unmount()
+    const { container } = render(<Bracket games={GAMES} hideScores />)
+    await userEvent.click(screen.getByRole('tab', { name: 'Regional 3' }))
+    expect(container.querySelector('.mm-team.won')).toBeNull()
+  })
 })
 
 describe('Bracket partway through the tournament', () => {

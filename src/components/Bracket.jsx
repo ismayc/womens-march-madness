@@ -23,7 +23,8 @@ function TeamLine({ t, onPick, hideScores }) {
   return (
     <button
       type="button"
-      className={`mm-team ${t.won ? 'won' : ''}`}
+      // The bold winner row is a spoiler too, so it stays off while scores are hidden.
+      className={`mm-team ${t.won && !hideScores ? 'won' : ''}`}
       onClick={() => onPick?.(t.abbr)}
       title={TEAM_BY_ABBR[t.abbr]?.displayName || t.abbr}
     >
@@ -55,7 +56,8 @@ function Match({ slot, onPick, hideScores }) {
         ))
       )}
       {slot.live && <span className="mm-live">● Live</span>}
-      {slot.ot > 0 && <span className="mm-ot">OT{slot.ot > 1 ? slot.ot : ''}</span>}
+      {/* An OT tag says the game was tied after regulation, so it waits for scores to show. */}
+      {slot.ot > 0 && !hideScores && <span className="mm-ot">OT{slot.ot > 1 ? slot.ot : ''}</span>}
     </div>
   )
 }

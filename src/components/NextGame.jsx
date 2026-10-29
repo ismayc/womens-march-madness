@@ -61,7 +61,7 @@ function Side({ abbr, seed }) {
   )
 }
 
-export default function NextGame({ games, tz }) {
+export default function NextGame({ games, tz, hideScores = false }) {
   const { isFollowed, count } = useFollow()
   const [, setTick] = useState(0)
 
@@ -141,7 +141,7 @@ export default function NextGame({ games, tz }) {
             <Side abbr={g.away} seed={g.awaySeed} />
             <span className="nm-v">{LEAGUE.homeAwaySep}</span>
             <Side abbr={g.home} seed={g.homeSeed} />
-            {live && <span className="live-badge">● {livePeriod(g)}</span>}
+            {live && <span className="live-badge">● {livePeriod(g, hideScores)}</span>}
             <span className="nm-when">{g.city}</span>
           </button>
         ))}
@@ -179,7 +179,7 @@ export default function NextGame({ games, tz }) {
 
       <div className="nm-bottom">
         {live ? (
-          <span className="nm-countdown live">● {livePeriod(game)}</span>
+          <span className="nm-countdown live">● {livePeriod(game, hideScores)}</span>
         ) : (
           <Countdown ms={new Date(game.tip).getTime() - now} />
         )}

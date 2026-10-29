@@ -31,6 +31,21 @@ describe('GameCard — live badge', () => {
   })
 })
 
+describe('GameCard: spoiler-free mode', () => {
+  // An OT tag, final or live, says the game was tied after regulation.
+  it('drops the OT suffix from a final', () => {
+    render(<GameCard game={{ ...base, score: [70, 68], ot: 2 }} tz={TZ} hideScores />)
+    expect(document.querySelector('.final-badge').textContent).toBe('Final')
+  })
+
+  it('shows only LIVE, in the badge and its tooltip', () => {
+    render(<GameCard game={{ ...base, live: true, period: 5, statusLabel: 'OT 5:12' }} tz={TZ} hideScores />)
+    const badge = document.querySelector('.live-badge')
+    expect(badge.textContent.trim()).toBe('● LIVE')
+    expect(badge.getAttribute('title')).not.toMatch(/OT/)
+  })
+})
+
 describe('GameCard — canceled vs postponed', () => {
   it('labels a canceled game Canceled', () => {
     // The `canceled` arm of the void badge (render.test already covers Postponed).

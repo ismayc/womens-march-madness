@@ -445,7 +445,7 @@ export default function App() {
             hideScores={hideScores}
           />
         )}
-        {view === 'schedule' && <NextGame games={scheduleGames} tz={tz} />}
+        {view === 'schedule' && <NextGame games={scheduleGames} tz={tz} hideScores={hideScores} />}
         {view === 'schedule' && (
           <ScheduleView
             games={scheduleGames}

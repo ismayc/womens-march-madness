@@ -4,6 +4,17 @@ A dated changelog for Women's March Madness. Each heading is a calendar
 day; bullet points capture every change made that day (features, fixes,
 data/source updates, deployment). Newest day on top.
 
+## 2026-10-29
+
+- **Spoiler-free mode no longer gives away overtime or the winner** (found on the NFL
+  viewer, issue #1). With scores hidden, a final still read "Final/OT" on the game cards,
+  and the bracket still showed an "OT" tag and put the winner's row in bold. Finals now
+  read only "Final", and the bracket drops the OT tag and the winner highlight. A live
+  game reads only "LIVE" on the card, its tooltip, and the next-game banner, since an
+  "OT" badge (or a period badge that later changes) tells the same story. The game popout
+  already hid all of this until "Reveal score". The live alert toasts are not changed
+  here: they are opt-in and still show scores and margins.
+
 ## 2026-09-18
 
 - **Player names in the Game leaders block are no longer cut on a phone.** The two teams

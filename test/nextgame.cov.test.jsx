@@ -25,11 +25,11 @@ const game = (over) => ({
   ...over,
 })
 
-const draw = (games, followed = []) => {
+const draw = (games, followed = [], hideScores = false) => {
   localStorage.setItem('mmw:followed', JSON.stringify(followed))
   return render(
     <FollowProvider>
-      <NextGame games={games} tz={TZ} />
+      <NextGame games={games} tz={TZ} hideScores={hideScores} />
     </FollowProvider>
   )
 }
@@ -103,6 +103,23 @@ describe('NextGame', () => {
     expect(screen.getByText('🔴 Live now')).toBeInTheDocument()
     expect(screen.getByText('● 3RD')).toBeInTheDocument()
     expect(screen.queryByLabelText('time until tip')).toBeNull()
+  })
+
+  // An OT badge on the banner says the game was tied after regulation.
+  it('shows only LIVE, never the period, in spoiler-free mode', () => {
+    const { unmount } = draw([game({ live: true, period: 5, statusLabel: 'OT 5:12' })], [], true)
+    expect(screen.getByText('● LIVE')).toBeInTheDocument()
+    expect(screen.queryByText(/OT/)).toBeNull()
+    unmount()
+    const { container } = draw(
+      [
+        game({ id: 'l1', live: true, period: 5 }),
+        game({ id: 'l2', live: true, period: 2, home: 'SC', away: 'LSU' }),
+      ],
+      [],
+      true
+    )
+    expect([...container.querySelectorAll('.live-badge')].map((b) => b.textContent)).toEqual(['● LIVE', '● LIVE'])
   })
 
   it('stacks several live games, with a period badge on each', () => {
