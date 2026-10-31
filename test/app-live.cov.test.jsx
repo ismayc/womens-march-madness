@@ -183,6 +183,25 @@ describe('live alerts fire toasts', () => {
     expect(within(toast).getByText(/Tip/i)).toBeInTheDocument()
   })
 
+  it('keeps the tipoff but drops the final toast in spoiler-free mode', async () => {
+    useFake()
+    localStorage.setItem('mmw:alerts', '1')
+    localStorage.setItem('mmw:spoilerFree', '1')
+    // Poll 1 tips the game off. Going live flips nLive, which repolls at once, and poll
+    // 2 reports the same game finished: the final must not join the tipoff toast.
+    fetchLive
+      .mockResolvedValueOnce(liveMap([liveEntry('900101')]))
+      .mockResolvedValue(
+        new Map([['900101', { id: '900101', live: false, final: true, period: 4, score: [64, 60] }]])
+      )
+    mount()
+    await settle(10)
+    expect(fetchLive.mock.calls.length).toBeGreaterThan(1)
+    const stack = screen.getByRole('status')
+    expect(stack).toHaveTextContent(/Tip/i)
+    expect(stack).not.toHaveTextContent('Final')
+  })
+
   it('lets a toast be dismissed', async () => {
     localStorage.setItem('mmw:alerts', '1')
     fetchLive.mockResolvedValue(liveMap([liveEntry('900101')]))

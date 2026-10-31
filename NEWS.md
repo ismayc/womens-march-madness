@@ -4,6 +4,13 @@ A dated changelog for Women's March Madness. Each heading is a calendar
 day; bullet points capture every change made that day (features, fixes,
 data/source updates, deployment). Newest day on top.
 
+## 2026-10-31
+
+- **Spoiler-free mode keeps only the tipoff alert.** Lead-change, close-finish, and final alerts say who leads,
+  how close it is, or who won, so with scores hidden only the tipoff alert shows.
+- **A close finish in overtime now says "in overtime".** The close-finish alert now says
+  "in the fourth quarter" in regulation and "in overtime" after it.
+
 ## 2026-10-29
 
 - **Spoiler-free mode no longer gives away overtime or the winner** (found on the NFL

@@ -14,7 +14,7 @@ import GameDetail from './components/GameDetail.jsx'
 import CalendarModal from './components/CalendarModal.jsx'
 import Toasts from './components/Toasts.jsx'
 import ServicesModal from './components/ServicesModal.jsx'
-import { detectEvents, eventKey } from './services/alerts.js'
+import { detectEvents, eventKey, spoilerSafe } from './services/alerts.js'
 import TeamLogo from './components/TeamLogo.jsx'
 import { LEAGUE } from './config/league.js'
 
@@ -138,9 +138,12 @@ export default function App() {
     prevGames.current = games
     if (!prev || !alerts) return
 
-    const found = detectEvents(prev, games, {
-      teams: onlyFollowed || followedCount ? followed : null,
-    })
+    const found = spoilerSafe(
+      detectEvents(prev, games, {
+        teams: onlyFollowed || followedCount ? followed : null,
+      }),
+      hideScores
+    )
     if (!found.length) return
 
     setToasts((cur) => {
@@ -148,7 +151,7 @@ export default function App() {
       const fresh = found.map((e) => ({ ...e, key: eventKey(e) })).filter((e) => !seen.has(e.key))
       return [...fresh, ...cur].slice(0, 4)
     })
-  }, [games, alerts, followed, followedCount, onlyFollowed])
+  }, [games, alerts, followed, followedCount, onlyFollowed, hideScores])
 
   useEffect(() => {
     if (!toasts.length) return
@@ -458,7 +461,7 @@ export default function App() {
       </main>
 
       <Toasts
-        events={toasts}
+        events={spoilerSafe(toasts, hideScores)}
         onOpen={(g) => setDetail(g)}
         onDismiss={(key) => setToasts((cur) => cur.filter((t) => t.key !== key))}
       />
