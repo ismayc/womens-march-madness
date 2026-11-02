@@ -802,7 +802,7 @@ select:hover,
    runs the full height. Ten rows read as one board rather than ten boxes. */
 .game {
   display: grid;
-  grid-template-columns: 96px 1fr;
+  grid-template-columns: 126px 1fr;
   gap: 16px;
   align-items: center;
   background: transparent;
@@ -3656,4 +3656,15 @@ select:hover,
   .bx-scroll:has(.boxscore:not(.bx-all)) {
     overflow: visible;
   }
+}
+
+/* The OT and LIVE tags were absolutely positioned at the card's right edge, which is
+   where the score is, so "OT" printed over the number at every width (found by the phone
+   scan, November 2, 2026). In flow, under the teams, they sit clear of it. */
+.mm-live,
+.mm-ot {
+  position: static;
+  display: block;
+  padding: 0 6px 3px;
+  text-align: right;
 }

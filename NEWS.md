@@ -4,6 +4,10 @@ A dated changelog for Women's March Madness. Each heading is a calendar
 day; bullet points capture every change made that day (features, fixes,
 data/source updates, deployment). Newest day on top.
 
+## 2026-11-02
+
+- **The OT and LIVE tags no longer cover the score.** They printed over the number at every width and now sit under the teams. The schedule's time column also has room for any tip-off time.
+
 ## 2026-10-31
 
 - **Spoiler-free mode keeps only the tipoff alert.** Lead-change, close-finish, and final alerts say who leads,
