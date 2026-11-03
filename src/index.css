@@ -3668,3 +3668,13 @@ select:hover,
   padding: 0 6px 3px;
   text-align: right;
 }
+
+/* A channel not announced yet: dashed and unbolded, the hub's treatment, so it reads as a
+   placeholder and not as a network called "Channel TBA". */
+.net-tba {
+  padding: 0 5px;
+  border: 1px dashed var(--border);
+  border-radius: 2px;
+  font-weight: 400;
+  white-space: nowrap;
+}
