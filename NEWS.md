@@ -4,6 +4,11 @@ A dated changelog for Women's March Madness. Each heading is a calendar
 day; bullet points capture every change made that day (features, fixes,
 data/source updates, deployment). Newest day on top.
 
+## 2026-11-07
+
+- **Spoiler-free mode no longer names the champion.** The bracket hid scores and the bold winner row, but the champion bar above it and the line under each region still named the winners. Both now wait until scores are shown.
+- **The README is up to date again.** It now lists the coverage and live-check commands, the box scores, and the full spoiler-free behavior, fixes the champion (UCLA over South Carolina) and the postseason-feed note, and uses the new site link.
+
 ## 2026-11-02
 
 - **An unannounced channel now says "Channel TBA".** ESPN lists no channel until a few days before a game, and the card and game detail used to show nothing. Only games still to come get the tag.

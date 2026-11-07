@@ -97,7 +97,8 @@ function Region({ region, onPick, hideScores }) {
           </div>
         ))}
       </div>
-      {region.champion && (
+      {/* Naming the region's winner gives away the Elite Eight result, so it waits for scores. */}
+      {region.champion && !hideScores && (
         <p className="mm-region-champ">
           <TeamLogo abbr={region.champion} size={22} /> {teamName(region.champion)} wins the{' '}
           {region.name} Region
@@ -133,7 +134,8 @@ export default function Bracket({ games, onPick, hideScores }) {
 
   return (
     <section className="mm-bracket">
-      {bracket.champion && (
+      {/* The champion bar names the title game's winner, so it waits for scores too. */}
+      {bracket.champion && !hideScores && (
         <div className="mm-champbar">
           <span className="mm-trophy" aria-hidden="true">
             🏆

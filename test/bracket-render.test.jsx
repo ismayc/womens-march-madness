@@ -63,6 +63,15 @@ describe('Bracket with a completed tournament', () => {
     await userEvent.click(screen.getByRole('tab', { name: 'Regional 3' }))
     expect(container.querySelector('.mm-team.won')).toBeNull()
   })
+
+  // The champion bar and the region winner line name the winners outright.
+  it('names no champion in spoiler-free mode', async () => {
+    const { container } = render(<Bracket games={GAMES} hideScores />)
+    expect(container.querySelector('.mm-champbar')).toBeNull()
+    await userEvent.click(screen.getByRole('tab', { name: 'Regional 2' }))
+    expect(screen.getByRole('heading', { name: 'Round of 64' })).toBeInTheDocument()
+    expect(container.querySelector('.mm-region-champ')).toBeNull()
+  })
 })
 
 describe('Bracket partway through the tournament', () => {
