@@ -36,7 +36,7 @@ merge fills the bracket as games finish.
 
 **The bracket is committed, not fetched.** `scripts/fetch-bracket.mjs` walks ESPN's public
 scoreboard across the tournament window, keeps only the NCAA-championship games (the same
-`seasontype=3` feed also carries other postseason events, such as the WBIT, so every game is
+`seasontype=3` feed also carries other postseason events, the WBIT and the Women's NIT, so every game is
 filtered by its notes headline), and writes `src/data/schedule.js` + `src/data/teams.js`. It
 asserts the known 67-game total before writing, so a silently-capped feed fails the build
 rather than shipping half a bracket.
