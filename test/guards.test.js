@@ -54,6 +54,15 @@ describe('the ESPN host', () => {
   })
 })
 
+describe('the refresh', () => {
+  // On November 8, 2026 the NFL sibling's refresh ran during a live overtime and committed
+  // overtime on a game with no score. fetch-bracket.mjs runs when imported, so this reads
+  // its source: overtime, like the score, waits for a completed game.
+  it('marks overtime only on a completed game', () => {
+    expect(read('scripts/fetch-bracket.mjs')).toMatch(/const otPeriods = (?:st\.)?completed && c\.status\?\.period > \d/)
+  })
+})
+
 describe('the storage namespace', () => {
   // The hub and all the sibling viewers are served from one origin
   // (ismayc.github.io), so localStorage is shared. A key prefix borrowed from a

@@ -120,7 +120,9 @@ function normalizeEvent(ev) {
     ? [Number(home.score?.value ?? home.score), Number(away.score?.value ?? away.score)]
     : undefined
   // Women's college regulation is four quarters (period 4); anything beyond is overtime.
-  const otPeriods = c.status?.period > 4 ? c.status.period - 4 : undefined
+  // Like the score, only for a completed game: an NFL refresh during a live overtime
+  // (November 8, 2026) committed overtime on an unscored game, and its gate failed.
+  const otPeriods = st.completed && c.status?.period > 4 ? c.status.period - 4 : undefined
   // Winner is authoritative from the feed; fall back to score for older payloads.
   const winner = home.winner ? 'home' : away.winner ? 'away' : completed
     ? score[0] > score[1] ? 'home' : 'away'

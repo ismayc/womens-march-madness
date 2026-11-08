@@ -4,6 +4,10 @@ A dated changelog for Women's March Madness. Each heading is a calendar
 day; bullet points capture every change made that day (features, fixes,
 data/source updates, deployment). Newest day on top.
 
+## 2026-11-08
+
+- **A refresh during a live overtime no longer marks overtime on an unfinished game.** Overtime was set from the period number while the score waited for the final, so a refresh that ran during an overtime game committed an overtime mark with no score. Overtime now waits for the final too. Found when the NFL viewer's refresh gate failed on a live overtime game on November 8, 2026.
+
 ## 2026-11-07
 
 - **Spoiler-free mode no longer names the champion.** The bracket hid scores and the bold winner row, but the champion bar above it and the line under each region still named the winners. Both now wait until scores are shown.
